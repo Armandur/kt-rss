@@ -61,7 +61,11 @@ i artikellistan.
   lita aldrig på den. Brödtext återpubliceras inte (innehållspolicy §7).
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
+- **Webbläsarnotiser.** Notis när nya artiklar dykt upp (eller annat
+  relevant). Kräver Web Push: en service worker, VAPID-nycklar,
+  push-prenumerationer lagrade per klient och utskick från servern.
+  Förutsätter HTTPS.
 
 ## Utanför scope
 
-Ingen auth (körs bakom egen proxy), ingen HTML-scraping, inga push-notiser.
+Ingen auth (körs bakom egen proxy), ingen HTML-scraping.
