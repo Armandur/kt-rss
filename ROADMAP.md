@@ -6,9 +6,7 @@ Poller, dedup, sanity, Atom/RSS-feeds totalt och per sektion, styleat
 HTML-gränssnitt, `/healthz`, Docker-deploy, manuell backfill. Se
 `docs/SPEC.md` för fullständig spec.
 
-## v2
-
-### Klart
+## v2 (klar)
 
 - **Tagg-pills på artiklar.** Artiklarnas `tags` lagras tvättat (kolumn i
   `articles`) och visas som klickbara pills i HTML-listan, länkade till
@@ -19,14 +17,16 @@ HTML-gränssnitt, `/healthz`, Docker-deploy, manuell backfill. Se
   `loading="lazy"`-thumbnail i webui-listorna. `build_image_url` i `feed.py`,
   env `KT_RSS_INCLUDE_IMAGE_ENCLOSURE`. Se `docs/SPEC.md` §2.2.
 
-### Idéer (ej påbörjat)
+Dessutom: poll-status flyttad till headern, klockslag och dag-separatorer
+i artikellistan.
+
+## v3 - idéer (ej påbörjat)
 
 - **Egenbyggda feeds på flera taggar.** Låt användaren kombinera flera
   taggar till en feed (query-baserad URL, t.ex. `/feed/tags.xml?t=a,b`).
   Designval att ta: OR- kontra AND-logik mellan taggarna. "Bygg själv"-delen
   bör vara ett UI med sökruta och lazyloading av tagglistan - taggarna är
   väldigt många (hundratals) så hela listan kan inte renderas rakt av.
-
 - **Textutdrag i feed-summary.** Om det någonsin görs: använd `subtitle`
   som primär summary. `bodytext` är osäkert fullständig och varierar per
   artikeltyp (poddar har programtext, inte transkription - spec §2.1) -
