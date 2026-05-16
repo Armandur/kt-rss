@@ -15,9 +15,10 @@ RUN uv sync --frozen --no-dev
 
 COPY kt_rss/ ./kt_rss/
 
-# Icke-root-användare; /data ägs av appen (volym monteras hit).
-RUN useradd --create-home --uid 10001 app \
-    && mkdir -p /data && chown -R app:app /app /data
+# Icke-root-användare uid 99 / gid 100 = Unraids nobody:users, så att en
+# monterad appdata-volym blir skrivbar utan extra chown. /data är volym-mount.
+RUN useradd --create-home --uid 99 --gid 100 app \
+    && mkdir -p /data && chown -R 99:100 /app /data
 USER app
 
 ENV PATH="/app/.venv/bin:$PATH"
