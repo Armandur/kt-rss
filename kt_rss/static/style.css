@@ -341,6 +341,25 @@ code {
 .section-links li { text-transform: capitalize; }
 .back { text-decoration: none; }
 
+/* Psalm 404 på 404-sidan - litet citat-påskägg. */
+.psalm {
+  margin: 2.6rem 0 0;
+  padding: 0.2rem 0 0.2rem 1.2rem;
+  border-left: 3px solid var(--line);
+  max-width: 32rem;
+}
+.psalm p {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink-soft);
+  margin: 0 0 0.4rem;
+}
+.psalm cite {
+  font-size: 0.84rem;
+  font-style: normal;
+  color: var(--ink-soft);
+}
+
 /* Infinite scroll-sentinel - tom, JS observerar den och laddar nästa batch. */
 .scroll-sentinel { padding: 1.5rem 0; }
 
