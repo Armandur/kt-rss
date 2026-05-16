@@ -96,12 +96,19 @@ def build_feed(
     *,
     section: str | None = None,
     tag: str | None = None,
+    tags: list[str] | None = None,
+    mode: str = "or",
     fmt: str = "atom",
 ) -> bytes:
     """Bygger en Atom- (default) eller RSS-feed av artikelraderna."""
     fg = FeedGenerator()
 
-    if tag:
+    if tags:
+        joined = quote(",".join(tags))
+        feed_url = f"{settings.public_url}/feed/tags.xml?t={joined}&mode={mode}"
+        sep = " och " if mode == "and" else " eller "
+        title = f"Kyrkans Tidning - taggar: {sep.join(tags)}"
+    elif tag:
         feed_url = f"{settings.public_url}/feed/t/{quote(tag)}.xml"
         title = f"Kyrkans Tidning - tagg: {tag}"
     elif section:

@@ -29,6 +29,7 @@ from kt_rss.db import (
     connect,
     count_articles,
     get_articles,
+    get_articles_for_tags,
     get_fetch_state,
     init_db,
     list_sections,
@@ -167,6 +168,34 @@ def feed_all(
     conn, settings = conn_settings
     articles = get_articles(conn, limit=settings.max_items)
     return _feed_response(build_feed(settings, articles, fmt=fmt), fmt)
+
+
+# Statisk route - måste stå före /feed/{section}.xml (annars matchar
+# "tags" som ett section-värde).
+@app.get("/feed/tags.xml")
+def feed_tags(
+    conn_settings=Depends(get_conn_settings),
+    t: str = Query(""),
+    mode: str = Query("or", pattern="^(or|and)$"),
+    fmt: str = Query("atom", pattern="^(atom|rss)$"),
+) -> Response:
+    conn, settings = conn_settings
+    known = set(_known_tags(conn))
+    tags = [
+        x for x in (s.strip().lower() for s in t.split(",")) if x and x in known
+    ]
+    if not tags:
+        return JSONResponse(
+            status_code=404,
+            content={"error": "inga giltiga taggar i parametern t",
+                     "valid_tags": sorted(known)},
+        )
+    articles = get_articles_for_tags(
+        conn, tags, mode=mode, limit=settings.max_items
+    )
+    return _feed_response(
+        build_feed(settings, articles, tags=tags, mode=mode, fmt=fmt), fmt
+    )
 
 
 @app.get("/feed/{section}.xml")
@@ -335,6 +364,16 @@ def articles_tag(
             "state": get_fetch_state(conn),
             "pagination": pg,
         },
+    )
+
+
+@app.get("/tags", response_class=HTMLResponse)
+def tag_feed_builder(request: Request, conn_settings=Depends(get_conn_settings)):
+    conn, settings = conn_settings
+    return templates.TemplateResponse(
+        request,
+        "tags.html",
+        {"tags": list_tags(conn), "state": get_fetch_state(conn)},
     )
 
 

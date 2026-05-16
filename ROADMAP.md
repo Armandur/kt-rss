@@ -37,14 +37,12 @@ i artikellistan.
   eller -1 för hela arkivet) startar en daemon-tråd vid uppstart som
   backfillar utan att blockera appstart. Markörfilen `{db}.backfill-done`
   hindrar omkörning. Se `docs/SPEC.md` §8.1.
+- **Egenbyggda feeds på flera taggar.** `/feed/tags.xml?t=a,b&mode=or/and`
+  kombinerar taggar (OR/AND). Bygg-vyn `/tags` har en sökbar tagglista och
+  genererar feed-URL:en (`feedbuilder.js`).
 
 ### Idéer (ej påbörjat)
 
-- **Egenbyggda feeds på flera taggar.** Låt användaren kombinera flera
-  taggar till en feed (query-baserad URL, t.ex. `/feed/tags.xml?t=a,b`).
-  Designval att ta: OR- kontra AND-logik mellan taggarna. "Bygg själv"-delen
-  bör vara ett UI med sökruta och lazyloading av tagglistan - taggarna är
-  väldigt många (hundratals) så hela listan kan inte renderas rakt av.
 - **Enkel sökfunktion.** Sökruta som filtrerar artiklar på titel och
   ingress (SQL `LIKE`, eller SQLite FTS5 om det växer). Ny route + sök-UI.
 - **Textutdrag i feed-summary.** Om det någonsin görs: använd `subtitle`

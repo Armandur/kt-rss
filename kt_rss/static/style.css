@@ -326,6 +326,72 @@ code {
   border-color: var(--accent);
 }
 
+/* --- Tagg-feed-byggare (/tags) --- */
+.feedbuilder { margin: 0.5rem 0 1.4rem; }
+
+.fb-controls {
+  display: flex;
+  gap: 0.6rem 1.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+#tag-search {
+  flex: 1 1 14rem;
+  font: inherit;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+}
+
+.fb-mode {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+.fb-mode label { display: flex; gap: 0.3rem; align-items: center; }
+
+.fb-tags {
+  display: flex;
+  flex-direction: column;
+  max-height: 22rem;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  padding: 0.4rem;
+}
+
+.fb-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+}
+.fb-tag:hover { background: var(--paper); }
+.fb-tag-name { flex: 1; }
+.fb-count { font-size: 0.8rem; color: var(--ink-soft); }
+
+.fb-result {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 2.5rem;
+}
+.fb-result p { margin: 0 0 0.3rem; font-size: 0.9rem; color: var(--ink-soft); }
+.fb-url {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.84rem;
+  word-break: break-all;
+}
+
 .article-foot {
   display: flex;
   gap: 0.9rem;

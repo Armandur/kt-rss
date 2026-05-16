@@ -17,9 +17,11 @@ aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/articles` | Stylead HTML-lista, alla artiklar |
 | `/s/{section}` | Stylead HTML-lista per sektion |
 | `/t/{tag}` | Stylead HTML-lista per tagg |
+| `/tags` | Bygg en feed på flera taggar (sök + kryssrutor) |
 | `/feed.xml` | Atom, alla sektioner (`?fmt=rss` ger RSS 2.0) |
 | `/feed/{section}.xml` | Atom per sektion (`?fmt=rss` ger RSS 2.0) |
 | `/feed/t/{tag}.xml` | Atom per tagg (`?fmt=rss` ger RSS 2.0) |
+| `/feed/tags.xml` | Atom på flera taggar (`?t=a,b&mode=or/and`) |
 | `/healthz` | JSON-status: antal artiklar, senaste poll m.m. |
 
 Sektioner härleds från datan (`section_tag`) - inget hårdkodas.

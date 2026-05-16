@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}KT-RSS | Bygg en tagg-feed{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="/">Start</a><span>/</span><span class="here">Bygg en tagg-feed</span>
+</nav>
+
+<header class="list-header">
+  <h1>Bygg en tagg-feed</h1>
+</header>
+
+<p class="lead">
+  Välj en eller flera taggar så genereras en feed-URL att prenumerera på.
+  Söklägena: <strong>någon</strong> tagg (bredare) eller <strong>alla</strong>
+  taggar (snävare).
+</p>
+
+{% if not tags %}
+<p class="empty">Inga taggar än. Listan fylls vid nästa poll.</p>
+{% else %}
+<form class="feedbuilder" id="feedbuilder">
+  <div class="fb-controls">
+    <input type="search" id="tag-search" placeholder="Sök tagg&hellip;"
+           autocomplete="off">
+    <fieldset class="fb-mode">
+      <label><input type="radio" name="mode" value="or" checked> Någon tagg</label>
+      <label><input type="radio" name="mode" value="and"> Alla taggar</label>
+    </fieldset>
+  </div>
+
+  <div class="fb-tags">
+    {% for tag, count in tags %}
+    <label class="fb-tag">
+      <input type="checkbox" name="t" value="{{ tag }}">
+      <span class="fb-tag-name">{{ tag }}</span>
+      <span class="fb-count">{{ count }}</span>
+    </label>
+    {% endfor %}
+  </div>
+</form>
+
+<div class="fb-result" id="fb-result" hidden>
+  <p>Din feed-URL:</p>
+  <a class="fb-url" id="fb-url" href="#" target="_blank" rel="noopener"></a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/feedbuilder.js" defer></script>
+{% endblock %}

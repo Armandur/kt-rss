@@ -4,7 +4,14 @@ from dataclasses import replace
 
 from fastapi.testclient import TestClient
 
-from kt_rss.db import connect, get_articles, list_tags, map_article, upsert_article
+from kt_rss.db import (
+    connect,
+    get_articles,
+    get_articles_for_tags,
+    list_tags,
+    map_article,
+    upsert_article,
+)
 from kt_rss.main import app, get_conn_settings
 
 BASE = "https://www.kyrkanstidning.se"
@@ -89,5 +96,53 @@ def test_route_feed_tag(db_path, settings, raw_articles):
         assert rss.status_code == 200
         assert "rss" in rss.headers["content-type"]
         assert client.get("/feed/t/finns-inte.xml").status_code == 404
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_get_articles_for_tags_or_och_and(db_path, raw_articles):
+    base = map_article(raw_articles[0], BASE)
+    conn = connect(db_path)
+    upsert_article(conn, replace(base, id="a", tags="nyhet, klimat"))
+    upsert_article(conn, replace(base, id="b", tags="nyhet"))
+    upsert_article(conn, replace(base, id="c", tags="klimat"))
+    conn.commit()
+    # OR: artiklar med någon av taggarna.
+    assert {r["id"] for r in get_articles_for_tags(
+        conn, ["nyhet", "klimat"], mode="or")} == {"a", "b", "c"}
+    # AND: bara artiklar med alla taggarna.
+    assert {r["id"] for r in get_articles_for_tags(
+        conn, ["nyhet", "klimat"], mode="and")} == {"a"}
+    assert get_articles_for_tags(conn, []) == []
+    conn.close()
+
+
+def test_route_feed_tags(db_path, settings, raw_articles):
+    base = map_article(raw_articles[0], BASE)
+    conn = connect(db_path)
+    upsert_article(conn, replace(base, id="a", tags="nyhet, klimat"))
+    conn.commit()
+    conn.close()
+
+    def _override():
+        c = connect(db_path)
+        try:
+            yield c, settings
+        finally:
+            c.close()
+
+    app.dependency_overrides[get_conn_settings] = _override
+    try:
+        client = TestClient(app)
+        ok = client.get("/feed/tags.xml?t=nyhet,klimat&mode=or")
+        assert ok.status_code == 200
+        assert "atom" in ok.headers["content-type"]
+        # Okända taggar filtreras bort; inga giltiga kvar -> 404.
+        assert client.get("/feed/tags.xml?t=struntprat").status_code == 404
+        assert client.get("/feed/tags.xml?t=").status_code == 404
+        # Ogiltigt mode fångas av FastAPI-validering.
+        assert client.get("/feed/tags.xml?t=nyhet&mode=xor").status_code == 422
+        # Bygg-UI-sidan renderar.
+        assert client.get("/tags").status_code == 200
     finally:
         app.dependency_overrides.clear()

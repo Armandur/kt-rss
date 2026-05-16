@@ -333,11 +333,13 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 | GET   | `/feed.xml`           | Atom, alla sektioner, senaste `MAX_ITEMS`         |
 | GET   | `/feed/{section}.xml` | Atom filtrerad på `section_tag`                   |
 | GET   | `/feed/t/{tag}.xml`   | Atom filtrerad på en tvättad tagg                 |
+| GET   | `/feed/tags.xml`      | Atom på flera taggar (`?t=a,b&mode=or/and`)       |
 | GET   | `/healthz`            | JSON: status, antal, senaste lyckad poll          |
 | GET   | `/`                   | HTML-startsida: sektionskort + feed-länkar        |
 | GET   | `/articles`           | HTML-lista, alla artiklar                         |
 | GET   | `/s/{section}`        | HTML-lista filtrerad på `section_tag`             |
 | GET   | `/t/{tag}`            | HTML-lista filtrerad på en tvättad tagg           |
+| GET   | `/tags`               | HTML: bygg en feed på flera taggar                |
 
 - Atom (RSS 2.0 via `?fmt=rss`). `Content-Type:
   application/atom+xml; charset=utf-8`.

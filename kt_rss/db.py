@@ -295,6 +295,31 @@ def get_articles(
     ).fetchall()
 
 
+def get_articles_for_tags(
+    conn: sqlite3.Connection,
+    tags: list[str],
+    *,
+    mode: str = "or",
+    limit: int = 50,
+) -> list[sqlite3.Row]:
+    """Artiklar som matchar flera taggar - OR (någon tagg) eller AND (alla).
+
+    Varje tagg går in som en ?-parameter; bara joinern (AND/OR) sätts av den
+    validerade `mode`-strängen, aldrig tagginnehållet. Tom lista in ger tom
+    lista ut.
+    """
+    if not tags:
+        return []
+    cond = "instr(', ' || tags || ', ', ', ' || ? || ', ') > 0"
+    joiner = " AND " if mode == "and" else " OR "
+    where = joiner.join([cond] * len(tags))
+    return conn.execute(
+        f"SELECT * FROM articles WHERE ({where}) "
+        "ORDER BY published_at DESC LIMIT ?",
+        (*tags, limit),
+    ).fetchall()
+
+
 def list_sections(conn: sqlite3.Connection) -> list[sqlite3.Row]:
     """Alla sektioner med antal - datadrivet, inget hårdkodas (spec SS4)."""
     return conn.execute(
