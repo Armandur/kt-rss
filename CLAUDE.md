@@ -5,9 +5,9 @@ filstrukturändringar.
 
 ## Vad projektet är
 
-En API-till-RSS-bro för Kyrkans Tidning. Pollar tidningens interna
-JSON-API (`https://api.kyrkanstidning.se/article`), lagrar artiklar i
-SQLite, exponerar Atom/RSS-feeds och ett styleat HTML-gränssnitt.
+En tjänst som genererar RSS-feeds för Kyrkans Tidning. Pollar tidningens
+interna JSON-API (`https://api.kyrkanstidning.se/article`), lagrar artiklar
+i SQLite, exponerar Atom/RSS-feeds och ett styleat HTML-gränssnitt.
 
 Fullständig styrande spec: `docs/SPEC.md`. Den är källan vid tvistefrågor.
 
@@ -71,9 +71,11 @@ timeout + få retries, endast GET. Se `api_client.py` och spec §3.
 
 ## URL-schema
 
-`/` index, `/articles` + `/s/{section}` HTML-listor, `/feed.xml` +
-`/feed/{section}.xml` Atom (`?fmt=rss` ger RSS). Sektioner är datadrivna
-(`section_tag`) - hårdkoda aldrig sektionslistan.
+`/` index, `/articles` + `/s/{section}` + `/t/{tag}` HTML-listor, `/feed.xml`
++ `/feed/{section}.xml` + `/feed/t/{tag}.xml` Atom (`?fmt=rss` ger RSS).
+Sektioner och taggar är datadrivna (`section_tag` respektive den tvättade
+`tags`-kolumnen) - hårdkoda aldrig listorna. Taggar tvättas i `map_article`
+(`_clean_tags`).
 
 ## Vanliga ändringar
 

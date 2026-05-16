@@ -2,7 +2,7 @@
 
 from dataclasses import fields
 
-from kt_rss.db import Article, _clean_url, _modified_to_iso, map_article
+from kt_rss.db import Article, _clean_tags, _clean_url, _modified_to_iso, map_article
 
 BASE = "https://www.kyrkanstidning.se"
 
@@ -47,3 +47,20 @@ def test_map_defensiv_vid_saknade_falt():
     assert a.id == ""
     assert a.subtitle == ""
     assert a.is_paywalled == 0
+    assert a.tags == ""
+
+
+def test_clean_tags_tvattar():
+    # 'out' är intern API-markering; section_tag dubbleras ofta i tags.
+    assert _clean_tags("nattvard, debatt, out", "debatt") == "nattvard"
+    # dubbletter bort, ordning bevarad, inre whitespace kollapsad
+    assert _clean_tags("a,  b  c , a", "") == "a, b c"
+    # tomt/None in -> tomt ut
+    assert _clean_tags("", "nyhet") == ""
+    assert _clean_tags(None, "nyhet") == ""
+
+
+def test_map_article_satter_tvattade_tags(raw_articles):
+    # Fixturens första artikel: section_tag=debatt, tags="nattvard, debatt".
+    a = map_article(raw_articles[0], BASE)
+    assert a.tags == "nattvard"

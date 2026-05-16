@@ -15,6 +15,7 @@ import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import quote
 from zoneinfo import ZoneInfo
 
 from fastapi import Depends, FastAPI, Query, Request
@@ -30,6 +31,7 @@ from kt_rss.db import (
     get_fetch_state,
     init_db,
     list_sections,
+    list_tags,
 )
 from kt_rss.db import STATUS_OK, STATUS_SKIPPED_304
 from kt_rss.feed import build_feed
@@ -115,6 +117,10 @@ def _known_sections(conn) -> list[str]:
     return [row["section"] for row in list_sections(conn)]
 
 
+def _known_tags(conn) -> list[str]:
+    return [tag for tag, _ in list_tags(conn)]
+
+
 # --------------------------------------------------------------------------
 # Feeds (XML)
 # --------------------------------------------------------------------------
@@ -157,6 +163,24 @@ def feed_section(
         )
     articles = get_articles(conn, section=section, limit=settings.max_items)
     return _feed_response(build_feed(settings, articles, section=section, fmt=fmt), fmt)
+
+
+@app.get("/feed/t/{tag}.xml")
+def feed_tag(
+    tag: str,
+    conn_settings=Depends(get_conn_settings),
+    fmt: str = Query("atom", pattern="^(atom|rss)$"),
+) -> Response:
+    conn, settings = conn_settings
+    tag_l = tag.strip().lower()
+    known = _known_tags(conn)
+    if tag_l not in known:
+        return JSONResponse(
+            status_code=404,
+            content={"error": f"okänd tagg: {tag}", "valid_tags": known},
+        )
+    articles = get_articles(conn, tag=tag_l, limit=settings.max_items)
+    return _feed_response(build_feed(settings, articles, tag=tag_l, fmt=fmt), fmt)
 
 
 # --------------------------------------------------------------------------
@@ -204,7 +228,7 @@ def articles_section(
         return templates.TemplateResponse(
             request,
             "notfound.html",
-            {"section": section, "sections": known},
+            {"kind": "sektion", "name": section, "sections": known},
             status_code=404,
         )
     articles = get_articles(conn, section=section, limit=settings.max_items)
@@ -216,6 +240,33 @@ def articles_section(
             "title": section,
             "section": section,
             "feed_path": f"/feed/{section}.xml",
+        },
+    )
+
+
+@app.get("/t/{tag}", response_class=HTMLResponse)
+def articles_tag(
+    tag: str, request: Request, conn_settings=Depends(get_conn_settings)
+):
+    conn, settings = conn_settings
+    tag_l = tag.strip().lower()
+    if tag_l not in _known_tags(conn):
+        return templates.TemplateResponse(
+            request,
+            "notfound.html",
+            {"kind": "tagg", "name": tag, "sections": _known_sections(conn)},
+            status_code=404,
+        )
+    articles = get_articles(conn, tag=tag_l, limit=settings.max_items)
+    return templates.TemplateResponse(
+        request,
+        "list.html",
+        {
+            "articles": articles,
+            "title": f"Tagg: {tag_l}",
+            "section": None,
+            "tag": tag_l,
+            "feed_path": f"/feed/t/{quote(tag_l)}.xml",
         },
     )
 

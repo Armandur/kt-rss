@@ -55,3 +55,17 @@ def test_andrad_titel_subtitle_modified_uppdateras(db_path, raw_articles):
     assert row["title"] == "Ny rubrik"
     assert row["subtitle"] == "Ny ingress"
     assert row["modified_at"] == "2099-01-01T00:00:00+00:00"
+
+
+def test_andrade_tags_uppdateras(db_path, raw_articles):
+    a = map_article(raw_articles[0], BASE)
+    conn = connect(db_path)
+    upsert_article(conn, a)
+
+    changed = replace(a, tags="helt, nya, taggar")
+    assert upsert_article(conn, changed) == "updated"
+    conn.commit()
+
+    row = conn.execute("SELECT tags FROM articles WHERE id = ?", (a.id,)).fetchone()
+    conn.close()
+    assert row["tags"] == "helt, nya, taggar"

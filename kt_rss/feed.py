@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import sqlite3
 from datetime import datetime, timezone
+from urllib.parse import quote
 
 from feedgen.feed import FeedGenerator
 
@@ -43,12 +44,16 @@ def build_feed(
     articles: list[sqlite3.Row],
     *,
     section: str | None = None,
+    tag: str | None = None,
     fmt: str = "atom",
 ) -> bytes:
     """Bygger en Atom- (default) eller RSS-feed av artikelraderna."""
     fg = FeedGenerator()
 
-    if section:
+    if tag:
+        feed_url = f"{settings.public_url}/feed/t/{quote(tag)}.xml"
+        title = f"Kyrkans Tidning - tagg: {tag}"
+    elif section:
         feed_url = f"{settings.public_url}/feed/{section}.xml"
         title = f"Kyrkans Tidning - {section}"
     else:
@@ -57,7 +62,7 @@ def build_feed(
 
     fg.id(feed_url)
     fg.title(title)
-    fg.description("Inofficiell RSS-bro för Kyrkans Tidning")
+    fg.description("Inofficiella RSS-feeds för Kyrkans Tidning")
     fg.link(href=settings.base_url, rel="alternate")
     fg.link(href=feed_url, rel="self")
     fg.language("sv")

@@ -2,11 +2,26 @@
 
 ## v1 (klar)
 
-API-till-RSS-bro: poller, dedup, sanity, Atom/RSS-feeds totalt och per
-sektion, styleat HTML-gränssnitt, `/healthz`, Docker-deploy, manuell
-backfill. Se `docs/SPEC.md` för fullständig spec.
+Poller, dedup, sanity, Atom/RSS-feeds totalt och per sektion, styleat
+HTML-gränssnitt, `/healthz`, Docker-deploy, manuell backfill. Se
+`docs/SPEC.md` för fullständig spec.
 
-## v2 - idéer (ej påbörjat)
+## v2
+
+### Klart
+
+- **Tagg-pills på artiklar.** Artiklarnas `tags` lagras tvättat (kolumn i
+  `articles`) och visas som klickbara pills i HTML-listan, länkade till
+  `/t/{tag}`. Varje tagg har även en egen feed (`/feed/t/{tag}.xml`).
+  Se `docs/SPEC.md` §6 och §9.
+
+### Idéer (ej påbörjat)
+
+- **Egenbyggda feeds på flera taggar.** Låt användaren kombinera flera
+  taggar till en feed (query-baserad URL, t.ex. `/feed/tags.xml?t=a,b`).
+  Designval att ta: OR- kontra AND-logik mellan taggarna. "Bygg själv"-delen
+  bör vara ett UI med sökruta och lazyloading av tagglistan - taggarna är
+  väldigt många (hundratals) så hela listan kan inte renderas rakt av.
 
 - **Bild-enclosure i feeds.** Bild-API:et är utrett och dokumenterat
   (`tests/fixtures/image-api-findings.md`, spec §2.2). Båda parametersetten
@@ -19,12 +34,6 @@ backfill. Se `docs/SPEC.md` för fullständig spec.
   lita aldrig på den. Brödtext återpubliceras inte (innehållspolicy §7).
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
-- **Tagg-pills på artiklar.** Utöver `section_tag` bär artiklar ett
-  `tags`-fält - en komma-separerad sträng (t.ex. `"nattvard, debatt"`).
-  Visa dessa som klickbara pills i HTML-listan. `tags` lagras inte i dag:
-  kräver ny kolumn i `articles` (ALTER TABLE-guard i `init_db()`), fält i
-  `Article` och `map_article` (`db.py`), samt rendering i `list.html` +
-  `style.css`.
 
 ## Utanför scope
 

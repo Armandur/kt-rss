@@ -1,4 +1,4 @@
-# Projektspecifikation v2: `kt-rss` — RSS-bro för Kyrkans Tidning
+# Projektspecifikation v2: `kt-rss` - RSS-feeds från Kyrkans Tidning
 
 > Mata denna fil till Claude Code som projektbeskrivning. Läs hela specen först,
 > ställ klargörande frågor om något är tvetydigt, börja sedan med projekt-
@@ -17,9 +17,9 @@ webbplatsens "hämta fler"-funktion anropar ett internt JSON-API på
 `https://api.kyrkanstidning.se/article`. API:et returnerar strukturerad
 artikeldata: titel, underrubrik, publiceringsdatum, sektion och URL.
 
-Detta projekt bygger en självhostad **API-till-RSS-bro**: en liten tjänst som
+Detta projekt bygger en självhostad **feed-generator**: en liten tjänst som
 periodiskt hämtar de senaste artiklarna via JSON-API:et, diffar mot en lokal
-databas, och exponerar genererade Atom/RSS-feeds — totalt och per sektion.
+databas, och exponerar genererade Atom/RSS-feeds - totalt och per sektion.
 
 **Utvecklingsflöde:**
 1. Utveckling i en Linux-dev-VM med Claude Code.
@@ -252,6 +252,7 @@ pytest. **Ingen HTML-parser.** Minimala dependencies.
 | `published_at` | TEXT     | `published` (ISO 8601 oförändrad)                        |
 | `modified_at`  | TEXT     | ISO 8601 UTC härledd från `modified` om satt             |
 | `is_paywalled` | INTEGER  | 1 om `paywall=="1"` eller `isInternalPaywall=="1"`       |
+| `tags`         | TEXT     | Tvättade ämnestaggar ur `tags`, `', '`-joinade (se nedan)|
 | `first_seen`   | TEXT     | ISO 8601 UTC, första gången sedd                         |
 | `last_seen`    | TEXT     | ISO 8601 UTC, senaste runda sedd                         |
 
@@ -260,8 +261,13 @@ pytest. **Ingen HTML-parser.** Minimala dependencies.
 `last_status` (`ok`/`skipped_304`/`error`/`sanity_failed`), `total_count`.
 
 **Dedup:** `id` är PK. Återkommande artikel uppdaterar `last_seen` (och
-ändrade fält som `modified_at`/`title`/`subtitle`); `first_seen` rörs aldrig.
-URL byggs en gång vid insert; strippa ev. tracking-parametrar defensivt.
+ändrade fält som `modified_at`/`title`/`subtitle`/`tags`); `first_seen` rörs
+aldrig. URL byggs en gång vid insert; strippa ev. tracking-parametrar defensivt.
+
+**Taggar:** `tags` lagras tvättat - API:ets kommaseparerade sträng med
+markeringen `out` och taggar identiska med `section_tag` borttagna,
+dubbletter strukna, gemener, `', '`-joinad. Tom om inget blir kvar. Det
+styleade gränssnittet visar dem som klickbara pills (`/t/{tag}`).
 
 ---
 
@@ -291,8 +297,8 @@ API:et returnerar full `bodytext` även för betalartiklar
    satt, behåll bara de `section_tag`.
 7. Per artikel (nyckel `str(id)`):
    - Okänd → INSERT, `first_seen=last_seen=now()`.
-   - Känd → uppdatera `last_seen`; om `modified`/`title`/`subtitle` ändrats,
-     uppdatera dessa. `first_seen` orörd.
+   - Känd → uppdatera `last_seen`; om `modified`/`title`/`subtitle`/`tags`
+     ändrats, uppdatera dessa. `first_seen` orörd.
 8. Uppdatera `fetch_state` (etag, last_modified, last_run_at, last_count,
    total_count, `last_status=ok`).
 
@@ -317,8 +323,12 @@ verktyg, ej del av löpande drift.
 |-------|-----------------------|---------------------------------------------------|
 | GET   | `/feed.xml`           | Atom, alla sektioner, senaste `MAX_ITEMS`         |
 | GET   | `/feed/{section}.xml` | Atom filtrerad på `section_tag`                   |
+| GET   | `/feed/t/{tag}.xml`   | Atom filtrerad på en tvättad tagg                 |
 | GET   | `/healthz`            | JSON: status, antal, senaste lyckad poll          |
-| GET   | `/`                   | Enkel HTML: lista över tillgängliga feeds         |
+| GET   | `/`                   | HTML-startsida: sektionskort + feed-länkar        |
+| GET   | `/articles`           | HTML-lista, alla artiklar                         |
+| GET   | `/s/{section}`        | HTML-lista filtrerad på `section_tag`             |
+| GET   | `/t/{tag}`            | HTML-lista filtrerad på en tvättad tagg           |
 
 - Atom (RSS 2.0 via `?fmt=rss`). `Content-Type:
   application/atom+xml; charset=utf-8`.

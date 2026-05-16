@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ title }} - RSS-bro{% endblock %}
+{% block title %}KT-RSS | {{ title }}{% endblock %}
 
 {% block content %}
 <nav class="crumbs">
@@ -8,7 +8,9 @@
 
 <header class="list-header">
   <h1>{{ title }}</h1>
+  {% if feed_path %}
   <a class="feed-badge feed-badge--lg" href="{{ feed_path }}">feed.xml</a>
+  {% endif %}
 </header>
 
 {% if not articles %}
@@ -31,6 +33,13 @@
       <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.title }}</a>
     </h2>
     {% if a.subtitle %}<p class="article-sub">{{ a.subtitle }}</p>{% endif %}
+    {% if a.tags %}
+    <div class="tags">
+      {% for tag in a.tags.split(', ') %}
+      <a class="tag-pill" href="/t/{{ tag|urlencode }}">{{ tag }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
     <div class="article-foot">
       <time datetime="{{ a.published_at }}">{{ a.published_at|sv_date }}</time>
       {% if a.is_paywalled %}<span class="paywall">Betalartikel</span>{% endif %}

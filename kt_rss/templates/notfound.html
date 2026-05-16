@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Okänd sektion - RSS-bro{% endblock %}
+{% block title %}KT-RSS | Okänd {{ kind }}{% endblock %}
 
 {% block content %}
 <section class="hero">
-  <h1>Okänd sektion</h1>
-  <p class="lead">Sektionen <strong>{{ section }}</strong> finns inte.</p>
+  <h1>Okänd {{ kind }}</h1>
+  <p class="lead">{{ kind|capitalize }}en <strong>{{ name }}</strong> finns inte.</p>
 </section>
 
 {% if sections %}

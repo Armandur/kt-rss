@@ -238,6 +238,31 @@ code {
   max-width: 44rem;
 }
 
+/* --- Tagg-pills --- */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.7rem;
+}
+
+.tag-pill {
+  font-size: 0.76rem;
+  text-decoration: none;
+  color: var(--ink-soft);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.13rem 0.62rem;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.tag-pill:hover {
+  background: var(--accent);
+  color: var(--paper);
+  border-color: var(--accent);
+}
+
 .article-foot {
   display: flex;
   gap: 0.9rem;

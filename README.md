@@ -1,6 +1,6 @@
 # kt-rss
 
-RSS-bro för Kyrkans Tidning. Tidningen saknar publik RSS-feed, men
+RSS-feeds för Kyrkans Tidning. Tidningen saknar publik RSS-feed, men
 webbplatsens "hämta fler"-knapp anropar ett internt JSON-API. `kt-rss`
 pollar det API:et periodiskt, lagrar artiklarna i SQLite och exponerar
 genererade **Atom/RSS-feeds** - totalt och per sektion - samt ett enkelt
