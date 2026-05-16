@@ -20,9 +20,7 @@ HTML-gränssnitt, `/healthz`, Docker-deploy, manuell backfill. Se
 Dessutom: poll-status flyttad till headern, klockslag och dag-separatorer
 i artikellistan.
 
-## v3
-
-### Klart
+## v3 (klar)
 
 - **Mobilanpassning av webui.** På smal skärm (<560px) floatar en liten
   thumbnail uppe till vänster och texten flödar runt den; `.wrap`-padding
@@ -40,24 +38,21 @@ i artikellistan.
 - **Egenbyggda feeds på flera taggar.** `/feed/tags.xml?t=a,b&mode=or/and`
   kombinerar taggar (OR/AND). Bygg-vyn `/tags` har en sökbar tagglista och
   genererar feed-URL:en (`feedbuilder.js`).
-- **Enkel sökfunktion.** `/search?q=` söker artiklar på titel och ingress
+- **Artikelsök.** `/search?q=` söker artiklar på titel och ingress
   (`instr`-substräng, versal-okänsligt). Sökruta i startsidans hero.
 
-### Idéer (ej påbörjat)
+## v4 - idéer (ej påbörjat)
 
+- **Bättre sök.** `/search` är i dag en enkel `instr`-substräng på titel
+  och ingress, utan ranking eller paginering. Uppslag: SQLite FTS5 för
+  ordmatchning och relevans, sök även i taggar och författare, korrekt
+  åäö-hantering, infinite scroll på resultaten.
 - **Textutdrag i feed-summary.** Om det någonsin görs: använd `subtitle`
   som primär summary. `bodytext` är osäkert fullständig och varierar per
   artikeltyp (poddar har programtext, inte transkription - spec §2.1) -
   lita aldrig på den. Brödtext återpubliceras inte (innehållspolicy §7).
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
-
-## v4 - idéer
-
-- **Bättre sök.** `/search` är i dag en enkel `instr`-substräng på titel
-  och ingress, utan ranking eller paginering. Uppslag: SQLite FTS5 för
-  ordmatchning och relevans, sök även i taggar och författare, korrekt
-  åäö-hantering, infinite scroll på resultaten.
 
 ## Utanför scope
 
