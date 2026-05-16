@@ -14,6 +14,12 @@ def test_should_backfill_nar_aktiverad(settings):
     assert _should_backfill(on) is True
 
 
+def test_should_backfill_minus_ett_kor_hela_arkivet(settings):
+    # -1 = hela arkivet, ska också trigga.
+    full = settings.model_copy(update={"backfill_pages": -1})
+    assert _should_backfill(full) is True
+
+
 def test_should_backfill_hoppar_nar_arkivet_genomgatt(settings):
     on = settings.model_copy(update={"backfill_pages": 5})
     _done_file(on.db_path).touch()

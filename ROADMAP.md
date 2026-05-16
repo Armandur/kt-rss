@@ -31,11 +31,12 @@ i artikellistan.
   automatiskt vid scroll - `scroll.js` hämtar nästa batch som HTML-fragment
   (`?partial=1`). `KT_RSS_PAGE_SIZE` styr batchstorleken.
 - **Startsidan som snabb bläddringsvy.** Sektionskorten är hopfällbara
-  (ihop på mobil) och "Senaste artiklarna" visas direkt på `/`.
-- **Full backfill vid containerstart.** `KT_RSS_BACKFILL_PAGES > 0` startar
-  en daemon-tråd vid uppstart som backfillar arkivet utan att blockera
-  appstart. Markörfilen `{db}.backfill-done` hindrar omkörning.
-  Se `docs/SPEC.md` §8.1.
+  (ihop på mobil) och "Senaste artiklarna" visas direkt på `/`, med samma
+  infinite scroll som listvyerna.
+- **Full backfill vid containerstart.** `KT_RSS_BACKFILL_PAGES` (sidantal
+  eller -1 för hela arkivet) startar en daemon-tråd vid uppstart som
+  backfillar utan att blockera appstart. Markörfilen `{db}.backfill-done`
+  hindrar omkörning. Se `docs/SPEC.md` §8.1.
 
 ### Idéer (ej påbörjat)
 

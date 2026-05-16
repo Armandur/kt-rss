@@ -69,8 +69,10 @@ def run_backfill(pages: int, delay: float, start: int | None) -> int:
     totals = {"inserted": 0, "updated": 0, "unchanged": 0}
     done = 0
     try:
-        while done < pages:
-            logger.info("backfill sida %d/%d (start=%d)", done + 1, pages, start)
+        # pages < 0 betyder hela arkivet (loopen stoppas av arkivslutet).
+        while pages < 0 or done < pages:
+            limit = "alla" if pages < 0 else pages
+            logger.info("backfill sida %d/%s (start=%d)", done + 1, limit, start)
             result = fetch_articles(settings, limit=BACKFILL_LIMIT, start=start)
             if not result.ok or not result.data:
                 logger.error("avbryter: hämtning misslyckades (%s)", result.error)
@@ -119,9 +121,9 @@ def run_backfill(pages: int, delay: float, start: int | None) -> int:
 
 
 def _should_backfill(settings) -> bool:
-    """Sant om en uppstarts-backfill ska köras: aktiverad via env och
-    arkivet inte redan genomgånget."""
-    return settings.backfill_pages > 0 and not _done_file(settings.db_path).exists()
+    """Sant om en uppstarts-backfill ska köras: aktiverad via env (positivt
+    sidantal eller -1 för hela arkivet) och arkivet inte redan genomgånget."""
+    return settings.backfill_pages != 0 and not _done_file(settings.db_path).exists()
 
 
 def maybe_start_backfill(settings) -> None:
@@ -133,10 +135,11 @@ def maybe_start_backfill(settings) -> None:
     """
     if not _should_backfill(settings):
         return
-    logger.info(
-        "backfill: startar bakgrundskörning, upp till %d sidor",
-        settings.backfill_pages,
+    omfattning = (
+        "hela arkivet" if settings.backfill_pages < 0
+        else f"upp till {settings.backfill_pages} sidor"
     )
+    logger.info("backfill: startar bakgrundskörning (%s)", omfattning)
     threading.Thread(
         target=run_backfill,
         args=(settings.backfill_pages, MIN_DELAY, None),

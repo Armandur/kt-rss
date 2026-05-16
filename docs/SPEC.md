@@ -318,8 +318,9 @@ Default AV, långsam (`delay` ≥ 3 s mellan sidor), avbrytbar/återupptagbar
 (spara senaste klarade `start` så körningen kan fortsätta). Bekvämlighets-
 verktyg, ej del av löpande drift.
 
-**Uppstarts-backfill:** env `KT_RSS_BACKFILL_PAGES > 0` kör samma backfill i
-en daemon-tråd vid containerstart - blockerar inte appstart eller `/healthz`.
+**Uppstarts-backfill:** env `KT_RSS_BACKFILL_PAGES` (positivt sidantal, eller
+`-1` för hela arkivet) kör samma backfill i en daemon-tråd vid containerstart
+- blockerar inte appstart eller `/healthz`.
 När hela arkivet är genomgånget skapas markörfilen `{db_path}.backfill-done`
 som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 
@@ -418,7 +419,7 @@ Gör detta hellre än att implementera mot en antagen pagineringsmodell.
 | `KT_RSS_PAGE_SIZE`        | `50`                                      | Artiklar per webui-sida      |
 | `KT_RSS_SECTION_ALLOWLIST`| `` (tom = alla)                           | Komma-sep `section_tag`      |
 | `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` | `true`                             | Artikelbild som feed-enclosure |
-| `KT_RSS_BACKFILL_PAGES`   | `0`                                       | Backfill vid start, sidor à 100 |
+| `KT_RSS_BACKFILL_PAGES`   | `0`                                       | Backfill vid start (0 av, -1 allt) |
 | `KT_RSS_LOG_LEVEL`        | `INFO`                                    |                              |
 
 ---

@@ -211,14 +211,17 @@ def feed_tag(
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request, conn_settings=Depends(get_conn_settings)):
     conn, settings = conn_settings
+    total = count_articles(conn)
     return templates.TemplateResponse(
         request,
         "index.html",
         {
             "sections": list_sections(conn),
-            "total_articles": count_articles(conn),
+            "total_articles": total,
             "state": get_fetch_state(conn),
             "articles": get_articles(conn, limit=settings.page_size),
+            # Sentineln pekar på /articles - startsidans lista är dess sida 1.
+            "pagination": _paginate("/articles", 1, total, settings.page_size),
         },
     )
 

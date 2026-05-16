@@ -64,5 +64,17 @@
 <div class="articles">
   {% include "_articles.html" %}
 </div>
+{% if pagination and pagination.next_page %}
+<div class="scroll-sentinel"
+     data-base="{{ pagination.base }}"
+     data-next-page="{{ pagination.next_page }}"
+     data-total-pages="{{ pagination.total_pages }}"></div>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if pagination and pagination.next_page %}
+<script src="/static/scroll.js" defer></script>
 {% endif %}
 {% endblock %}
