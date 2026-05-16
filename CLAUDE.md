@@ -29,7 +29,7 @@ kt_rss/
   poller.py       en pollningsrunda: sanity, filtrering, upsert
   scheduler.py    APScheduler - periodisk poll + uppstartspoll
   feed.py         feedgen: Atom/RSS-serialisering
-  backfill.py     valfri manuell CLI-backfill (spec §8.1)
+  backfill.py     manuell CLI-backfill + uppstarts-backfill (spec §8.1)
   main.py         FastAPI-app: feeds, HTML-vyer, /healthz, lifespan
   templates/      base.html, index.html, list.html, _articles.html, notfound.html
   static/         style.css, scroll.js (infinite scroll)

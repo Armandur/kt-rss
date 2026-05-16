@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -29,6 +30,12 @@ MIN_DELAY = 3.0
 
 def _resume_file(db_path: str) -> Path:
     return Path(db_path + ".backfill")
+
+
+def _done_file(db_path: str) -> Path:
+    """Markör som skapas när hela arkivet är genomgånget - hindrar att
+    uppstarts-backfill kör om allt vid varje containeromstart."""
+    return Path(db_path + ".backfill-done")
 
 
 def _is_public(raw: dict, allowed: set[str]) -> bool:
@@ -73,6 +80,7 @@ def run_backfill(pages: int, delay: float, start: int | None) -> int:
             if not articles:
                 logger.info("inga fler artiklar - klart")
                 resume.unlink(missing_ok=True)
+                _done_file(settings.db_path).touch()
                 break
 
             for raw in articles:
@@ -91,6 +99,7 @@ def run_backfill(pages: int, delay: float, start: int | None) -> int:
             if total_count and start >= total_count:
                 logger.info("nådde totalCount=%d - klart", total_count)
                 resume.unlink(missing_ok=True)
+                _done_file(settings.db_path).touch()
                 break
             time.sleep(delay)
     except KeyboardInterrupt:
@@ -107,6 +116,33 @@ def run_backfill(pages: int, delay: float, start: int | None) -> int:
         done, totals["inserted"], totals["updated"], totals["unchanged"],
     )
     return 0
+
+
+def _should_backfill(settings) -> bool:
+    """Sant om en uppstarts-backfill ska köras: aktiverad via env och
+    arkivet inte redan genomgånget."""
+    return settings.backfill_pages > 0 and not _done_file(settings.db_path).exists()
+
+
+def maybe_start_backfill(settings) -> None:
+    """Startar en bakgrunds-backfill vid uppstart om _should_backfill().
+
+    Körs i en daemon-tråd så att appstart och /healthz inte blockeras - en
+    full backfill tar tiotals minuter. run_backfill committar per sida och
+    har en resume-sidecar, så en avbruten körning återupptas vid nästa start.
+    """
+    if not _should_backfill(settings):
+        return
+    logger.info(
+        "backfill: startar bakgrundskörning, upp till %d sidor",
+        settings.backfill_pages,
+    )
+    threading.Thread(
+        target=run_backfill,
+        args=(settings.backfill_pages, MIN_DELAY, None),
+        daemon=True,
+        name="backfill",
+    ).start()
 
 
 def main(argv: list[str] | None = None) -> int:

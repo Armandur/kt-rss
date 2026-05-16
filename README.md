@@ -82,6 +82,7 @@ Se [`.env.example`](.env.example) för fullständig lista. De viktigaste:
 | `KT_RSS_PAGE_SIZE` | `50` | Artiklar per sida i webui (infinite scroll) |
 | `KT_RSS_SECTION_ALLOWLIST` | (tom = alla) | Komma-separerade `section_tag` |
 | `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` | `true` | Artikelbild som enclosure i feeds |
+| `KT_RSS_BACKFILL_PAGES` | `0` | Backfill vid start: sidor à 100 artiklar (0 = av) |
 
 ## Hövlighet mot KT:s API
 

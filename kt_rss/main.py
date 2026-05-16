@@ -23,6 +23,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from kt_rss.backfill import maybe_start_backfill
 from kt_rss.config import Settings, get_settings
 from kt_rss.db import (
     connect,
@@ -92,6 +93,7 @@ async def lifespan(app: FastAPI):
     scheduler.start()
     app.state.settings = settings
     app.state.scheduler = scheduler
+    maybe_start_backfill(settings)
     logger.info("kt-rss startad (db=%s)", settings.db_path)
     try:
         yield

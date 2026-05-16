@@ -30,6 +30,12 @@ i artikellistan.
 - **Paginering / infinite scroll.** Artikellistorna laddar fler artiklar
   automatiskt vid scroll - `scroll.js` hämtar nästa batch som HTML-fragment
   (`?partial=1`). `KT_RSS_PAGE_SIZE` styr batchstorleken.
+- **Startsidan som snabb bläddringsvy.** Sektionskorten är hopfällbara
+  (ihop på mobil) och "Senaste artiklarna" visas direkt på `/`.
+- **Full backfill vid containerstart.** `KT_RSS_BACKFILL_PAGES > 0` startar
+  en daemon-tråd vid uppstart som backfillar arkivet utan att blockera
+  appstart. Markörfilen `{db}.backfill-done` hindrar omkörning.
+  Se `docs/SPEC.md` §8.1.
 
 ### Idéer (ej påbörjat)
 
@@ -38,22 +44,14 @@ i artikellistan.
   Designval att ta: OR- kontra AND-logik mellan taggarna. "Bygg själv"-delen
   bör vara ett UI med sökruta och lazyloading av tagglistan - taggarna är
   väldigt många (hundratals) så hela listan kan inte renderas rakt av.
+- **Enkel sökfunktion.** Sökruta som filtrerar artiklar på titel och
+  ingress (SQL `LIKE`, eller SQLite FTS5 om det växer). Ny route + sök-UI.
 - **Textutdrag i feed-summary.** Om det någonsin görs: använd `subtitle`
   som primär summary. `bodytext` är osäkert fullständig och varierar per
   artikeltyp (poddar har programtext, inte transkription - spec §2.1) -
   lita aldrig på den. Brödtext återpubliceras inte (innehållspolicy §7).
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
-- **Full backfill vid containerstart.** En env-variabel (t.ex.
-  `KT_RSS_BACKFILL_PAGES`) som vid uppstart triggar en backfill av arkivet.
-  Måste köras som bakgrundsuppgift, inte i `lifespan` - en full backfill tar
-  ~28 min och får inte blockera appstart eller `/healthz`. Behöver en "redan
-  klar"-markör så den inte kör om ~328 API-anrop vid varje containeromstart;
-  `backfill.py`:s resume-sidecar täcker delar av det.
-- **Startsidan som snabb bläddringsvy.** Flytta "Alla artiklar"-kortet
-  nedanför sektionskorten på `/`. Visa dessutom en artikellista direkt på
-  `/` (samma stil som `/articles`) under korten, så `/` blir en snabb
-  "vad är nytt"-vy utan att behöva klicka vidare.
 
 ## Utanför scope
 

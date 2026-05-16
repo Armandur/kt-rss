@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     page_size: int = 50
     section_allowlist: str = ""
     include_image_enclosure: bool = True
+    backfill_pages: int = 0
     log_level: str = "INFO"
 
     @field_validator("poll_minutes")
