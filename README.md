@@ -16,8 +16,10 @@ aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/` | Startsida: sektionskort + feed-länkar |
 | `/articles` | Stylead HTML-lista, alla artiklar |
 | `/s/{section}` | Stylead HTML-lista per sektion |
+| `/t/{tag}` | Stylead HTML-lista per tagg |
 | `/feed.xml` | Atom, alla sektioner (`?fmt=rss` ger RSS 2.0) |
 | `/feed/{section}.xml` | Atom per sektion (`?fmt=rss` ger RSS 2.0) |
+| `/feed/t/{tag}.xml` | Atom per tagg (`?fmt=rss` ger RSS 2.0) |
 | `/healthz` | JSON-status: antal artiklar, senaste poll m.m. |
 
 Sektioner härleds från datan (`section_tag`) - inget hårdkodas.
@@ -78,6 +80,7 @@ Se [`.env.example`](.env.example) för fullständig lista. De viktigaste:
 | `KT_RSS_MAX_FETCH` | `50` | Artiklar per poll |
 | `KT_RSS_MAX_ITEMS` | `50` | Items per feed |
 | `KT_RSS_SECTION_ALLOWLIST` | (tom = alla) | Komma-separerade `section_tag` |
+| `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` | `true` | Artikelbild som enclosure i feeds |
 
 ## Hövlighet mot KT:s API
 

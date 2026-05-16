@@ -14,6 +14,10 @@ HTML-gränssnitt, `/healthz`, Docker-deploy, manuell backfill. Se
   `articles`) och visas som klickbara pills i HTML-listan, länkade till
   `/t/{tag}`. Varje tagg har även en egen feed (`/feed/t/{tag}.xml`).
   Se `docs/SPEC.md` §6 och §9.
+- **Artikelbilder.** Bild-id lagras i `articles`. Bilden läggs som enclosure
+  i feeds (`<enclosure>` / `<link rel="enclosure">`) och som
+  `loading="lazy"`-thumbnail i webui-listorna. `build_image_url` i `feed.py`,
+  env `KT_RSS_INCLUDE_IMAGE_ENCLOSURE`. Se `docs/SPEC.md` §2.2.
 
 ### Idéer (ej påbörjat)
 
@@ -23,11 +27,6 @@ HTML-gränssnitt, `/healthz`, Docker-deploy, manuell backfill. Se
   bör vara ett UI med sökruta och lazyloading av tagglistan - taggarna är
   väldigt många (hundratals) så hela listan kan inte renderas rakt av.
 
-- **Bild-enclosure i feeds.** Bild-API:et är utrett och dokumenterat
-  (`tests/fixtures/image-api-findings.md`, spec §2.2). Båda parametersetten
-  (`x/y/cropw/croph` och `frontCropUrl`) ger giltig `image/webp`. En env
-  `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` är reserverad. Kräver en testbar
-  `build_image_url(image_id, crop, fmt)`.
 - **Textutdrag i feed-summary.** Om det någonsin görs: använd `subtitle`
   som primär summary. `bodytext` är osäkert fullständig och varierar per
   artikeltyp (poddar har programtext, inte transkription - spec §2.1) -
@@ -45,6 +44,12 @@ HTML-gränssnitt, `/healthz`, Docker-deploy, manuell backfill. Se
   `max_items`. Kräver `offset` i `get_articles` samt sid- eller
   lazyload-navigering i `list.html`. Feeds berörs inte - de ska förbli
   senaste N (RSS-konvention).
+- **Startsidan som snabb bläddringsvy.** Flytta "Alla artiklar"-kortet
+  nedanför sektionskorten på `/`. Visa dessutom en artikellista direkt på
+  `/` (samma stil som `/articles`) under korten, så `/` blir en snabb
+  "vad är nytt"-vy utan att behöva klicka vidare.
+- **Mobilgranskning av webui.** Verifiera att HTML-vyerna ser vettiga ut
+  och fungerar på mobil skärmbredd - hittills bara testat på desktop.
 
 ## Utanför scope
 

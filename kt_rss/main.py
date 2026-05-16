@@ -34,7 +34,7 @@ from kt_rss.db import (
     list_tags,
 )
 from kt_rss.db import STATUS_OK, STATUS_SKIPPED_304
-from kt_rss.feed import build_feed
+from kt_rss.feed import build_feed, build_image_url
 from kt_rss.scheduler import create_scheduler
 
 logger = logging.getLogger("kt_rss")
@@ -76,6 +76,7 @@ def _sv_datetime(iso: str | None) -> str:
 
 templates.env.filters["sv_date"] = _sv_date
 templates.env.filters["sv_datetime"] = _sv_datetime
+templates.env.globals["image_url"] = build_image_url
 
 
 @asynccontextmanager
@@ -214,6 +215,7 @@ def articles_all(request: Request, conn_settings=Depends(get_conn_settings)):
             "title": "Alla artiklar",
             "section": None,
             "feed_path": "/feed.xml",
+            "state": get_fetch_state(conn),
         },
     )
 
@@ -240,6 +242,7 @@ def articles_section(
             "title": section,
             "section": section,
             "feed_path": f"/feed/{section}.xml",
+            "state": get_fetch_state(conn),
         },
     )
 
@@ -267,6 +270,7 @@ def articles_tag(
             "section": None,
             "tag": tag_l,
             "feed_path": f"/feed/t/{quote(tag_l)}.xml",
+            "state": get_fetch_state(conn),
         },
     )
 

@@ -61,8 +61,9 @@ mot live-API:et: `FIRST_PAGE_START = 0`, offset-paginering, `orderBy=published`
 
 API:et returnerar full `bodytext` även för betalartiklar. Den återpubliceras
 aldrig: `map_article()` läser den inte, `Article` saknar fältet, och feeds/
-HTML visar bara rubrik + ingress + länk. Kommentarer i `db.py`, `feed.py`
-och `list.html` markerar detta - "optimera" inte bort dem.
+HTML visar rubrik, ingress, länk och artikelbild - aldrig brödtext.
+Kommentarer i `db.py`, `feed.py` och `list.html` markerar detta - "optimera"
+inte bort dem.
 
 ## Hövlighet (rör inte)
 

@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     max_fetch: int = 50
     max_items: int = 50
     section_allowlist: str = ""
+    include_image_enclosure: bool = True
     log_level: str = "INFO"
 
     @field_validator("poll_minutes")

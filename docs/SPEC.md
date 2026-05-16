@@ -148,18 +148,17 @@ https://image.kyrkanstidning.se/433475.webp?imageId=433475
   **Bootstrap (§10) ska verifiera vilken parameteruppsättning bild-API:et
   faktiskt accepterar** innan URL-byggaren skrivs.
 
-**Användning i detta projekt:**
-- v1-feeden är text + länk (§7) och inkluderar **inte** bilder i feed-items
-  som standard. Bild-API:et dokumenteras här så att en bild-enclosure (Atom
-  `<link rel="enclosure">` / RSS `<enclosure>`) kan läggas till i v2 utan
-  ny utredning.
-- Om bild-enclosure aktiveras i framtiden: bygg en rimligt stor rendition
-  (t.ex. full bredd, `cropw=100&croph=100` om ingen meningsfull crop finns)
-  och `format=webp`. Implementera URL-byggaren isolerat i en testbar
-  funktion `build_image_url(image_id, crop, fmt)` med enhetstester mot
-  fixtures.
-- En valfri env `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` (default `false`) reserveras
-  för detta, men funktionen byggs inte i v1.
+**Användning i detta projekt (v2):**
+- `feed.py:build_image_url(image_id, *, width, height, fmt)` bygger bild-URL:er.
+  Crop låses till full bild (`0/0/100/100`) - feeds och webui vill ha hela
+  motivet, inte en panorama-crop. `width`/`height` ger en nedskalad rendition
+  (KT:s egen listvy använder 240x156); webui skickar 480x312, feed-enclosure
+  utelämnar storlek.
+- Feeds: artikelbilden läggs som enclosure (Atom `<link rel="enclosure">` /
+  RSS `<enclosure>`). feedgen 1.0.0 tappar attribut på Atom-entry-länkar, så
+  `feed.py` lagar dem i efterhand (`_fix_atom_enclosure_links`).
+- HTML: artikellistorna visar bilden som `loading="lazy"`-thumbnail.
+- Env `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` (default `true`) styr feed-enclosuren.
 
 ### 2.3 Känd oklarhet — MÅSTE utredas i bootstrap (§10)
 I det observerade anropet fungerade `start=100` men `start=0` rapporterades
@@ -253,6 +252,7 @@ pytest. **Ingen HTML-parser.** Minimala dependencies.
 | `modified_at`  | TEXT     | ISO 8601 UTC härledd från `modified` om satt             |
 | `is_paywalled` | INTEGER  | 1 om `paywall=="1"` eller `isInternalPaywall=="1"`       |
 | `tags`         | TEXT     | Tvättade ämnestaggar ur `tags`, `', '`-joinade (se nedan)|
+| `image_id`     | TEXT     | Primärt bild-id (`image`), tomt om artikeln saknar bild  |
 | `first_seen`   | TEXT     | ISO 8601 UTC, första gången sedd                         |
 | `last_seen`    | TEXT     | ISO 8601 UTC, senaste runda sedd                         |
 
@@ -261,8 +261,9 @@ pytest. **Ingen HTML-parser.** Minimala dependencies.
 `last_status` (`ok`/`skipped_304`/`error`/`sanity_failed`), `total_count`.
 
 **Dedup:** `id` är PK. Återkommande artikel uppdaterar `last_seen` (och
-ändrade fält som `modified_at`/`title`/`subtitle`/`tags`); `first_seen` rörs
-aldrig. URL byggs en gång vid insert; strippa ev. tracking-parametrar defensivt.
+ändrade fält som `modified_at`/`title`/`subtitle`/`tags`/`image_id`);
+`first_seen` rörs aldrig. URL byggs en gång vid insert; strippa ev.
+tracking-parametrar defensivt.
 
 **Taggar:** `tags` lagras tvättat - API:ets kommaseparerade sträng med
 markeringen `out` och taggar identiska med `section_tag` borttagna,
@@ -274,10 +275,12 @@ styleade gränssnittet visar dem som klickbara pills (`/t/{tag}`).
 ## 7. Upphovsrätt / innehållspolicy (medvetet designbeslut)
 
 API:et returnerar full `bodytext` även för betalartiklar
-(`isInternalPaywall: "1"`). Detta utnyttjas INTE i v1:
+(`isInternalPaywall: "1"`). Den utnyttjas ALDRIG:
 
-- Feed-items innehåller **endast** `title`, `subtitle`, länk.
-- `bodytext` lagras INTE och återpubliceras aldrig i v1.
+- Feeds och HTML visar `title`, `subtitle`, länk och artikelbild - aldrig
+  `bodytext`. Bilden ligger som enclosure i feeds (v2, §2.2) och som
+  `loading="lazy"`-thumbnail i webui.
+- `bodytext` lagras INTE och återpubliceras aldrig.
 - Kommentera detta tydligt i koden så det inte "optimeras bort" senare.
 
 ---
@@ -297,8 +300,8 @@ API:et returnerar full `bodytext` även för betalartiklar
    satt, behåll bara de `section_tag`.
 7. Per artikel (nyckel `str(id)`):
    - Okänd → INSERT, `first_seen=last_seen=now()`.
-   - Känd → uppdatera `last_seen`; om `modified`/`title`/`subtitle`/`tags`
-     ändrats, uppdatera dessa. `first_seen` orörd.
+   - Känd → uppdatera `last_seen`; om `modified`/`title`/`subtitle`/`tags`/
+     `image_id` ändrats, uppdatera dessa. `first_seen` orörd.
 8. Uppdatera `fetch_state` (etag, last_modified, last_run_at, last_count,
    total_count, `last_status=ok`).
 
@@ -335,6 +338,9 @@ verktyg, ej del av löpande drift.
 - Item: `title`=`title`; `id`/`guid`/`link`=absolut URL;
   `updated`/`published`=`published_at`; `summary`=`subtitle` (tom → utelämna
   eller kicker); `author`=`author` om satt.
+- Enclosure: artikelbilden (§2.2) som `<enclosure>` (RSS) / `<link
+  rel="enclosure">` (Atom) när `image_id` finns och
+  `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` är på.
 - Sortering `published_at` fallande, max `KT_RSS_MAX_ITEMS`.
 - Feed-`updated` = max `last_seen`/`published_at` i urvalet.
 - Okänd `{section}` → 404 + lista giltiga sektioner.
@@ -402,6 +408,7 @@ Gör detta hellre än att implementera mot en antagen pagineringsmodell.
 | `KT_RSS_MAX_FETCH`        | `50`                                      | Artiklar per poll            |
 | `KT_RSS_MAX_ITEMS`        | `50`                                      | Items per feed               |
 | `KT_RSS_SECTION_ALLOWLIST`| `` (tom = alla)                           | Komma-sep `section_tag`      |
+| `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` | `true`                             | Artikelbild som feed-enclosure |
 | `KT_RSS_LOG_LEVEL`        | `INFO`                                    |                              |
 
 ---

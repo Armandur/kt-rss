@@ -78,6 +78,7 @@ class Article:
     modified_at: str | None
     is_paywalled: int
     tags: str
+    image_id: str
 
 
 def map_article(raw: dict, base_url: str) -> Article:
@@ -101,6 +102,7 @@ def map_article(raw: dict, base_url: str) -> Article:
         modified_at=_modified_to_iso(raw.get("modified")),
         is_paywalled=1 if (paywall or internal) else 0,
         tags=_clean_tags(raw.get("tags"), section),
+        image_id=str(raw.get("image") or "").strip(),
     )
 
 
@@ -134,6 +136,7 @@ def init_db(db_path: str) -> None:
                 modified_at   TEXT,
                 is_paywalled  INTEGER NOT NULL DEFAULT 0,
                 tags          TEXT NOT NULL DEFAULT '',
+                image_id      TEXT NOT NULL DEFAULT '',
                 first_seen    TEXT NOT NULL,
                 last_seen     TEXT NOT NULL
             );
@@ -156,11 +159,15 @@ def init_db(db_path: str) -> None:
             INSERT OR IGNORE INTO fetch_state (key) VALUES ('default');
             """
         )
-        # ALTER TABLE-guard: tags-kolumnen tillkom efter v1 (ROADMAP v2).
+        # ALTER TABLE-guards: kolumner som tillkom efter v1 (ROADMAP v2).
         cols = {r["name"] for r in conn.execute("PRAGMA table_info(articles)")}
         if "tags" not in cols:
             conn.execute(
                 "ALTER TABLE articles ADD COLUMN tags TEXT NOT NULL DEFAULT ''"
+            )
+        if "image_id" not in cols:
+            conn.execute(
+                "ALTER TABLE articles ADD COLUMN image_id TEXT NOT NULL DEFAULT ''"
             )
         conn.commit()
     finally:
@@ -175,7 +182,8 @@ def upsert_article(conn: sqlite3.Connection, a: Article) -> str:
     """
     now = now_utc()
     row = conn.execute(
-        "SELECT title, subtitle, modified_at, tags FROM articles WHERE id = ?",
+        "SELECT title, subtitle, modified_at, tags, image_id "
+        "FROM articles WHERE id = ?",
         (a.id,),
     ).fetchone()
 
@@ -184,28 +192,30 @@ def upsert_article(conn: sqlite3.Connection, a: Article) -> str:
             """
             INSERT INTO articles (
                 id, url, title, subtitle, section, kicker, author,
-                published_at, modified_at, is_paywalled, tags,
+                published_at, modified_at, is_paywalled, tags, image_id,
                 first_seen, last_seen
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (a.id, a.url, a.title, a.subtitle, a.section, a.kicker, a.author,
-             a.published_at, a.modified_at, a.is_paywalled, a.tags, now, now),
+             a.published_at, a.modified_at, a.is_paywalled, a.tags, a.image_id,
+             now, now),
         )
         return "inserted"
 
-    # Känd artikel: first_seen rör vi aldrig. title/subtitle/modified_at/tags
-    # uppdateras vid ändring (spec SS8:7); last_seen uppdateras alltid.
+    # Känd artikel: first_seen rör vi aldrig. title/subtitle/modified_at/tags/
+    # image_id uppdateras vid ändring (spec SS8:7); last_seen uppdateras alltid.
     changed = (
         row["title"] != a.title
         or row["subtitle"] != a.subtitle
         or row["modified_at"] != a.modified_at
         or row["tags"] != a.tags
+        or row["image_id"] != a.image_id
     )
     if changed:
         conn.execute(
             "UPDATE articles SET title = ?, subtitle = ?, modified_at = ?, "
-            "tags = ?, last_seen = ? WHERE id = ?",
-            (a.title, a.subtitle, a.modified_at, a.tags, now, a.id),
+            "tags = ?, image_id = ?, last_seen = ? WHERE id = ?",
+            (a.title, a.subtitle, a.modified_at, a.tags, a.image_id, now, a.id),
         )
         return "updated"
 

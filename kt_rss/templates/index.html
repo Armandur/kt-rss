@@ -42,16 +42,3 @@
 </p>
 {% endif %}
 {% endblock %}
-
-{% block footer %}
-{% if state and state.last_run_at %}
-<footer class="site-footer">
-  <div class="wrap">
-    <p class="status">
-      Senaste poll: <strong>{{ state.last_status or 'okänd' }}</strong>
-      &middot; {{ state.last_run_at|sv_datetime }}
-    </p>
-  </div>
-</footer>
-{% endif %}
-{% endblock %}

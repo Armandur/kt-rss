@@ -48,6 +48,21 @@ code {
   border-bottom: 1px solid var(--line);
 }
 
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 1.4rem;
+  flex-wrap: wrap;
+}
+
+.poll-status {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+}
+.poll-status strong { text-transform: capitalize; }
+
 .brand {
   display: flex;
   align-items: center;
@@ -200,11 +215,39 @@ code {
 /* --- Artikellista --- */
 .articles { padding-bottom: 2.5rem; }
 
+/* Dag-rubrik som grupperar artiklarna datum för datum. */
+.day-sep {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent);
+  padding: 1.4rem 0 0.3rem;
+  border-bottom: 2px solid var(--line);
+}
+
 .article {
+  display: flex;
+  gap: 1.2rem;
   padding: 1.5rem 0;
   border-bottom: 1px solid var(--line);
 }
 .article:last-child { border-bottom: none; }
+/* Ingen avgränsningslinje efter dagens sista artikel - nästa dag-rubrik
+   tar vid. Avståndet bevaras (paddings, inte border). */
+.article:has(+ .day-sep) { border-bottom: none; }
+
+.article-thumb { flex-shrink: 0; }
+.article-thumb img {
+  display: block;
+  width: 200px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+
+/* min-width:0 låter textspalten krympa i stället för att svämma över. */
+.article-body { min-width: 0; }
 
 .article-meta {
   display: flex;
@@ -297,15 +340,3 @@ code {
 .section-links { columns: 2; max-width: 26rem; }
 .section-links li { text-transform: capitalize; }
 .back { text-decoration: none; }
-
-/* --- Footer --- */
-.site-footer {
-  /* Ingen egen bakgrund - footern smälter in i sidan, inget ljusare/
-     mörkare avsnitt. Bara en tunn linje skiljer den från innehållet. */
-  border-top: 1px solid var(--line);
-  margin-top: 2.5rem;
-  padding: 1.2rem 0 1.6rem;
-}
-
-.site-footer .status { margin: 0; font-size: 0.88rem; }
-.site-footer .status strong { text-transform: capitalize; }

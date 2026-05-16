@@ -48,6 +48,13 @@ def test_map_defensiv_vid_saknade_falt():
     assert a.subtitle == ""
     assert a.is_paywalled == 0
     assert a.tags == ""
+    assert a.image_id == ""
+
+
+def test_map_article_satter_image_id(raw_articles):
+    # Fixturens första artikel har image="434429".
+    a = map_article(raw_articles[0], BASE)
+    assert a.image_id == "434429"
 
 
 def test_clean_tags_tvattar():

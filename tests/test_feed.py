@@ -1,6 +1,7 @@
 """Feed-serialisering: valid Atom/RSS, ALDRIG bodytext (spec SS7, SS9)."""
 
 import xml.etree.ElementTree as ET
+from dataclasses import replace
 
 from kt_rss.db import connect, get_articles, map_article, upsert_article
 from kt_rss.feed import build_feed
@@ -75,6 +76,52 @@ def test_tag_feed_filtrerar_och_titel(settings, db_path, raw_articles):
     xml = build_feed(settings, rows, tag="svenska kyrkan", fmt="atom").decode("utf-8")
     ET.fromstring(xml)
     assert "tagg: svenska kyrkan" in xml
+
+
+def test_atom_enclosure_pa_artikel_med_bild(settings, db_path, raw_articles):
+    rows = _seed(db_path, raw_articles)
+    root = ET.fromstring(build_feed(settings, rows, fmt="atom"))
+    entries = root.findall(f"{ATOM_NS}entry")
+    assert entries
+    for entry in entries:
+        # feedgen-buggen tappar attributen; _fix_atom_enclosure_links lagar dem.
+        enc = entry.find(f"{ATOM_NS}link[@rel='enclosure']")
+        assert enc is not None
+        assert enc.get("type") == "image/webp"
+        assert enc.get("href").startswith("https://image.kyrkanstidning.se/")
+
+
+def test_rss_enclosure_pa_artikel_med_bild(settings, db_path, raw_articles):
+    rows = _seed(db_path, raw_articles)
+    root = ET.fromstring(build_feed(settings, rows, fmt="rss"))
+    items = root.findall(".//item")
+    assert items
+    for item in items:
+        enc = item.find("enclosure")
+        assert enc is not None
+        assert enc.get("type") == "image/webp"
+        assert enc.get("url").startswith("https://image.kyrkanstidning.se/")
+
+
+def test_enclosure_av_via_settings(settings, db_path, raw_articles):
+    rows = _seed(db_path, raw_articles)
+    off = settings.model_copy(update={"include_image_enclosure": False})
+    root = ET.fromstring(build_feed(off, rows, fmt="atom"))
+    for entry in root.findall(f"{ATOM_NS}entry"):
+        assert entry.find(f"{ATOM_NS}link[@rel='enclosure']") is None
+
+
+def test_ingen_enclosure_utan_bild(settings, db_path, raw_articles):
+    conn = connect(db_path)
+    a = map_article(raw_articles[0], "https://www.kyrkanstidning.se")
+    upsert_article(conn, replace(a, id="nobild", image_id=""))
+    conn.commit()
+    rows = get_articles(conn, limit=10)
+    conn.close()
+    assert len(rows) == 1
+    root = ET.fromstring(build_feed(settings, rows, fmt="atom"))
+    entry = root.find(f"{ATOM_NS}entry")
+    assert entry.find(f"{ATOM_NS}link[@rel='enclosure']") is None
 
 
 def test_tom_feed_ar_valid(settings):
