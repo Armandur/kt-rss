@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Okänd sektion - RSS-bro{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1>Okänd sektion</h1>
+  <p class="lead">Sektionen <strong>{{ section }}</strong> finns inte.</p>
+</section>
+
+{% if sections %}
+<p>Tillgängliga sektioner:</p>
+<ul class="section-links">
+  {% for s in sections %}
+  <li><a href="/s/{{ s|urlencode }}">{{ s }}</a></li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<p><a class="back" href="/">&larr; Till startsidan</a></p>
+{% endblock %}

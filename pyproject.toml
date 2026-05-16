@@ -1,0 +1,25 @@
+[project]
+name = "kt-rss"
+version = "0.1.0"
+description = "RSS-bro för Kyrkans Tidning - genererar Atom/RSS-feeds från tidningens interna JSON-API"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "apscheduler>=3.11",
+    "httpx>=0.28",
+    "brotli>=1.1",
+    "feedgen>=1.0",
+    "pydantic-settings>=2.7",
+    "jinja2>=3.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

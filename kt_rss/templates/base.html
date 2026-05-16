@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}kt-rss{% endblock %}</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/">
+        <span class="brand-mark">KT</span>
+        <span class="brand-text">
+          <strong>RSS-bro</strong>
+          <small>Kyrkans Tidning</small>
+        </span>
+      </a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block footer %}{% endblock %}
+</body>
+</html>

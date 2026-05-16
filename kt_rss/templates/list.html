@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - RSS-bro{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="/">Start</a><span>/</span><span class="here">{{ title }}</span>
+</nav>
+
+<header class="list-header">
+  <h1>{{ title }}</h1>
+  <a class="feed-badge feed-badge--lg" href="{{ feed_path }}">feed.xml</a>
+</header>
+
+{% if not articles %}
+<p class="empty">Inga artiklar än. Listan fylls vid nästa poll.</p>
+{% endif %}
+
+{#
+  Spec SS7: den styleade vyn visar ALDRIG bodytext - bara rubrik, ingress,
+  kicker, författare, datum och länk ut till KT. bodytext finns inte ens i
+  datamodellen (se kt_rss/db.py). Lägg inte till brödtext här.
+#}
+<div class="articles">
+  {% for a in articles %}
+  <article class="article">
+    <div class="article-meta">
+      {% if a.kicker %}<span class="kicker">{{ a.kicker }}</span>{% endif %}
+      {% if a.author %}<span class="author">{{ a.author }}</span>{% endif %}
+    </div>
+    <h2 class="article-title">
+      <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.title }}</a>
+    </h2>
+    {% if a.subtitle %}<p class="article-sub">{{ a.subtitle }}</p>{% endif %}
+    <div class="article-foot">
+      <time datetime="{{ a.published_at }}">{{ a.published_at|sv_date }}</time>
+      {% if a.is_paywalled %}<span class="paywall">Betalartikel</span>{% endif %}
+      <a class="readlink" href="{{ a.url }}" target="_blank" rel="noopener">
+        Läs på kyrkanstidning.se &rarr;
+      </a>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

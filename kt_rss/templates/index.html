@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}RSS-bro för Kyrkans Tidning{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1>Feeds från Kyrkans Tidning</h1>
+  <p class="lead">
+    Periodiskt uppdaterade Atom- och RSS-feeds, totalt och per sektion.
+    Öppna en sektion för att läsa, eller prenumerera via <code>.xml</code>-länken.
+  </p>
+</section>
+
+<div class="cards">
+  <div class="card card--all">
+    <a class="card-main" href="/articles">
+      <span class="card-kicker">Allt</span>
+      <span class="card-title">Alla artiklar</span>
+      <span class="card-meta">
+        {{ total_articles }} {{ 'artikel' if total_articles == 1 else 'artiklar' }}
+        i arkivet
+      </span>
+    </a>
+    <a class="feed-badge" href="/feed.xml">feed.xml</a>
+  </div>
+
+  {% for row in sections %}
+  <div class="card">
+    <a class="card-main" href="/s/{{ row.section|urlencode }}">
+      <span class="card-kicker">Sektion</span>
+      <span class="card-title">{{ row.section }}</span>
+      <span class="card-meta">
+        {{ row.count }} {{ 'artikel' if row.count == 1 else 'artiklar' }}
+      </span>
+    </a>
+    <a class="feed-badge" href="/feed/{{ row.section|urlencode }}.xml">feed.xml</a>
+  </div>
+  {% endfor %}
+</div>
+
+{% if not sections %}
+<p class="empty">
+  Inga artiklar än - feeden fylls vid första pollen (sker kort efter start).
+</p>
+{% endif %}
+{% endblock %}
+
+{% block footer %}
+{% if state and state.last_run_at %}
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="status">
+      Senaste poll: <strong>{{ state.last_status or 'okänd' }}</strong>
+      &middot; {{ state.last_run_at|sv_datetime }}
+    </p>
+  </div>
+</footer>
+{% endif %}
+{% endblock %}
