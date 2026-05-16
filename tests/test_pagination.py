@@ -73,3 +73,28 @@ def test_route_partial_ger_fragment(db_path, settings, raw_articles):
         assert "<article" in frag.text
     finally:
         app.dependency_overrides.clear()
+
+
+def test_index_visar_senaste_artiklar(db_path, settings, raw_articles):
+    base = map_article(raw_articles[0], BASE)
+    conn = connect(db_path)
+    upsert_article(conn, replace(base, id="x1"))
+    conn.commit()
+    conn.close()
+
+    def _override():
+        c = connect(db_path)
+        try:
+            yield c, settings
+        finally:
+            c.close()
+
+    app.dependency_overrides[get_conn_settings] = _override
+    try:
+        client = TestClient(app)
+        r = client.get("/")
+        assert r.status_code == 200
+        assert "Senaste artiklarna" in r.text
+        assert "<article" in r.text
+    finally:
+        app.dependency_overrides.clear()

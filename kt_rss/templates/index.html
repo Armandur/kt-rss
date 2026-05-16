@@ -9,36 +9,60 @@
   </p>
 </section>
 
-<div class="cards">
-  <div class="card card--all">
-    <a class="card-main" href="/articles">
-      <span class="card-kicker">Allt</span>
-      <span class="card-title">Alla artiklar</span>
-      <span class="card-meta">
-        {{ total_articles }} {{ 'artikel' if total_articles == 1 else 'artiklar' }}
-        i arkivet
-      </span>
-    </a>
-    <a class="feed-badge" href="/feed.xml">feed.xml</a>
-  </div>
+<details class="sections-toggle">
+  <summary>Sektioner</summary>
+  <div class="cards">
+    {% for row in sections %}
+    <div class="card">
+      <a class="card-main" href="/s/{{ row.section|urlencode }}">
+        <span class="card-kicker">Sektion</span>
+        <span class="card-title">{{ row.section }}</span>
+        <span class="card-meta">
+          {{ row.count }} {{ 'artikel' if row.count == 1 else 'artiklar' }}
+        </span>
+      </a>
+      <a class="feed-badge" href="/feed/{{ row.section|urlencode }}.xml">feed.xml</a>
+    </div>
+    {% endfor %}
 
-  {% for row in sections %}
-  <div class="card">
-    <a class="card-main" href="/s/{{ row.section|urlencode }}">
-      <span class="card-kicker">Sektion</span>
-      <span class="card-title">{{ row.section }}</span>
-      <span class="card-meta">
-        {{ row.count }} {{ 'artikel' if row.count == 1 else 'artiklar' }}
-      </span>
-    </a>
-    <a class="feed-badge" href="/feed/{{ row.section|urlencode }}.xml">feed.xml</a>
+    <div class="card card--all">
+      <a class="card-main" href="/articles">
+        <span class="card-kicker">Allt</span>
+        <span class="card-title">Alla artiklar</span>
+        <span class="card-meta">
+          {{ total_articles }} {{ 'artikel' if total_articles == 1 else 'artiklar' }}
+          i arkivet
+        </span>
+      </a>
+      <a class="feed-badge" href="/feed.xml">feed.xml</a>
+    </div>
   </div>
-  {% endfor %}
-</div>
+</details>
+{#
+  Sektionerna börjar ihopfällda (mobil ser "Senaste artiklarna" direkt).
+  På desktop fälls de ut och summaryn döljs. Utan JS går de att fälla
+  ut manuellt - summaryn är då kvar och klickbar.
+#}
+<script>
+  (function () {
+    var d = document.querySelector(".sections-toggle");
+    if (d && matchMedia("(min-width: 561px)").matches) {
+      d.open = true;
+      d.classList.add("is-static");
+    }
+  })();
+</script>
 
 {% if not sections %}
 <p class="empty">
   Inga artiklar än - feeden fylls vid första pollen (sker kort efter start).
 </p>
+{% endif %}
+
+{% if articles %}
+<h2 class="home-heading">Senaste artiklarna</h2>
+<div class="articles">
+  {% include "_articles.html" %}
+</div>
 {% endif %}
 {% endblock %}

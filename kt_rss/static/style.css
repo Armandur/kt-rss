@@ -158,6 +158,17 @@ code {
 .card--all { grid-column: 1 / -1; background: #fbf3ef; }
 .card--all .card-title { font-size: 1.6rem; }
 
+/* Hopfällbara sektionskort. Summaryn syns på mobil (toggle) och som
+   fallback utan JS; på desktop lägger JS .is-static som döljer den. */
+.sections-toggle > summary {
+  cursor: pointer;
+  padding: 0.5rem 0;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+.sections-toggle.is-static > summary { display: none; }
+
 /* --- Feed-badge --- */
 .feed-badge {
   position: absolute;
@@ -214,6 +225,15 @@ code {
 
 /* --- Artikellista --- */
 .articles { padding-bottom: 2.5rem; }
+
+/* Rubrik över "Senaste artiklarna" på startsidan. */
+.home-heading {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  margin: 1.4rem 0 0;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--accent);
+}
 
 /* Dag-rubrik som grupperar artiklarna datum för datum. */
 .day-sep {
