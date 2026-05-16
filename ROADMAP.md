@@ -40,11 +40,11 @@ i artikellistan.
 - **Egenbyggda feeds på flera taggar.** `/feed/tags.xml?t=a,b&mode=or/and`
   kombinerar taggar (OR/AND). Bygg-vyn `/tags` har en sökbar tagglista och
   genererar feed-URL:en (`feedbuilder.js`).
+- **Enkel sökfunktion.** `/search?q=` söker artiklar på titel och ingress
+  (`instr`-substräng, versal-okänsligt). Sökruta i startsidans hero.
 
 ### Idéer (ej påbörjat)
 
-- **Enkel sökfunktion.** Sökruta som filtrerar artiklar på titel och
-  ingress (SQL `LIKE`, eller SQLite FTS5 om det växer). Ny route + sök-UI.
 - **Textutdrag i feed-summary.** Om det någonsin görs: använd `subtitle`
   som primär summary. `bodytext` är osäkert fullständig och varierar per
   artikeltyp (poddar har programtext, inte transkription - spec §2.1) -

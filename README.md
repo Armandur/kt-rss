@@ -18,6 +18,7 @@ aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/s/{section}` | Stylead HTML-lista per sektion |
 | `/t/{tag}` | Stylead HTML-lista per tagg |
 | `/tags` | Bygg en feed på flera taggar (sök + kryssrutor) |
+| `/search` | Sök artiklar på rubrik och ingress (`?q=`) |
 | `/feed.xml` | Atom, alla sektioner (`?fmt=rss` ger RSS 2.0) |
 | `/feed/{section}.xml` | Atom per sektion (`?fmt=rss` ger RSS 2.0) |
 | `/feed/t/{tag}.xml` | Atom per tagg (`?fmt=rss` ger RSS 2.0) |

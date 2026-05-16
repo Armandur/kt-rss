@@ -320,6 +320,26 @@ def get_articles_for_tags(
     ).fetchall()
 
 
+def search_articles(
+    conn: sqlite3.Connection, query: str, *, limit: int = 50
+) -> list[sqlite3.Row]:
+    """Söker artiklar på titel och ingress, nyaste först.
+
+    Substrängsökning via `instr` i stället för `LIKE` - då tolkas inte
+    `%`/`_` i söktermen som wildcards. ASCII-okänslig för versaler via
+    `lower()`. Tom sökterm ger tom lista.
+    """
+    q = query.strip().lower()
+    if not q:
+        return []
+    return conn.execute(
+        "SELECT * FROM articles "
+        "WHERE instr(lower(title), ?) > 0 OR instr(lower(subtitle), ?) > 0 "
+        "ORDER BY published_at DESC LIMIT ?",
+        (q, q, limit),
+    ).fetchall()
+
+
 def list_sections(conn: sqlite3.Connection) -> list[sqlite3.Row]:
     """Alla sektioner med antal - datadrivet, inget hårdkodas (spec SS4)."""
     return conn.execute(

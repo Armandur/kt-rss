@@ -34,6 +34,7 @@ from kt_rss.db import (
     init_db,
     list_sections,
     list_tags,
+    search_articles,
 )
 from kt_rss.db import STATUS_OK, STATUS_SKIPPED_304
 from kt_rss.feed import build_feed, build_image_url
@@ -374,6 +375,21 @@ def tag_feed_builder(request: Request, conn_settings=Depends(get_conn_settings))
         request,
         "tags.html",
         {"tags": list_tags(conn), "state": get_fetch_state(conn)},
+    )
+
+
+@app.get("/search", response_class=HTMLResponse)
+def search(
+    request: Request,
+    conn_settings=Depends(get_conn_settings),
+    q: str = Query(""),
+):
+    conn, settings = conn_settings
+    results = search_articles(conn, q, limit=settings.page_size)
+    return templates.TemplateResponse(
+        request,
+        "search.html",
+        {"q": q, "articles": results, "state": get_fetch_state(conn)},
     )
 
 

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}KT-RSS | Sök{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="/">Start</a><span>/</span><span class="here">Sök</span>
+</nav>
+
+<header class="list-header">
+  <h1>Sök</h1>
+</header>
+
+<form class="searchbox" action="/search" method="get" role="search">
+  <input type="search" name="q" value="{{ q }}"
+         placeholder="Sök i rubrik och ingress&hellip;" autofocus>
+  <button type="submit">Sök</button>
+</form>
+
+{% if q %}
+<p class="lead">
+  {{ articles|length }} träff{{ '' if articles|length == 1 else 'ar' }}
+  för &rdquo;{{ q }}&rdquo;.
+</p>
+{% endif %}
+
+{% if articles %}
+<div class="articles">
+  {% include "_articles.html" %}
+</div>
+{% elif q %}
+<p class="empty">Inga artiklar matchade sökningen.</p>
+{% endif %}
+{% endblock %}

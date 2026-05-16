@@ -73,7 +73,8 @@ timeout + få retries, endast GET. Se `api_client.py` och spec §3.
 ## URL-schema
 
 `/` index, `/articles` + `/s/{section}` + `/t/{tag}` HTML-listor, `/tags`
-bygg-en-feed-vy, `/feed.xml` + `/feed/{section}.xml` + `/feed/t/{tag}.xml` +
+bygg-en-feed-vy, `/search` artikelsök, `/feed.xml` + `/feed/{section}.xml` +
+`/feed/t/{tag}.xml` +
 `/feed/tags.xml` (flera taggar, `?t=a,b&mode=or/and`) Atom (`?fmt=rss` ger
 RSS). Sektioner och taggar är datadrivna (`section_tag` respektive den
 tvättade `tags`-kolumnen) - hårdkoda aldrig listorna. Taggar tvättas i

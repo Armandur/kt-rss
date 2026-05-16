@@ -340,6 +340,7 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 | GET   | `/s/{section}`        | HTML-lista filtrerad på `section_tag`             |
 | GET   | `/t/{tag}`            | HTML-lista filtrerad på en tvättad tagg           |
 | GET   | `/tags`               | HTML: bygg en feed på flera taggar                |
+| GET   | `/search`             | HTML: sök artiklar på titel/ingress (`?q=`)       |
 
 - Atom (RSS 2.0 via `?fmt=rss`). `Content-Type:
   application/atom+xml; charset=utf-8`.

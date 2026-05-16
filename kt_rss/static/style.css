@@ -107,6 +107,36 @@ code {
   margin: 0;
 }
 
+/* --- Sökruta (startsidan + /search) --- */
+.searchbox {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 32rem;
+  margin: 1.1rem 0 0;
+}
+.searchbox input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+}
+.searchbox button {
+  font: inherit;
+  cursor: pointer;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--paper);
+}
+.searchbox button:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+
 /* --- Sektionskort --- */
 .cards {
   display: grid;
