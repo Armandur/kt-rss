@@ -50,6 +50,11 @@ i artikellistan.
 - **Bläddra via taggar.** En översiktsvy som listar alla taggar (taggmoln
   eller sökbar lista) att klicka sig in i `/t/{tag}` från. I dag når man
   taggvyerna bara via pills på artiklar eller `/tags`-feedbyggaren.
+- **Mörkt/ljust tema.** Mörkt läge utöver det nuvarande ljusa. Följ OS:et
+  via `prefers-color-scheme`, med möjlighet att växla manuellt. CSS-
+  variablerna i `:root` gör det enkelt - en mörk palett under
+  `@media (prefers-color-scheme: dark)` plus en `[data-theme]`-override
+  för manuellt val.
 - **Textutdrag i feed-summary.** Om det någonsin görs: använd `subtitle`
   som primär summary. `bodytext` är osäkert fullständig och varierar per
   artikeltyp (poddar har programtext, inte transkription - spec §2.1) -
