@@ -52,6 +52,13 @@ i artikellistan.
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
 
+## v4 - idéer
+
+- **Bättre sök.** `/search` är i dag en enkel `instr`-substräng på titel
+  och ingress, utan ranking eller paginering. Uppslag: SQLite FTS5 för
+  ordmatchning och relevans, sök även i taggar och författare, korrekt
+  åäö-hantering, infinite scroll på resultaten.
+
 ## Utanför scope
 
 Ingen auth (körs bakom egen proxy), ingen HTML-scraping, inga push-notiser.
