@@ -20,7 +20,15 @@ HTML-gränssnitt, `/healthz`, Docker-deploy, manuell backfill. Se
 Dessutom: poll-status flyttad till headern, klockslag och dag-separatorer
 i artikellistan.
 
-## v3 - idéer (ej påbörjat)
+## v3
+
+### Klart
+
+- **Mobilanpassning av webui.** På smal skärm (<560px) floatar en liten
+  thumbnail uppe till vänster och texten flödar runt den; `.wrap`-padding
+  och 404-sidans sektionslista justerade.
+
+### Idéer (ej påbörjat)
 
 - **Egenbyggda feeds på flera taggar.** Låt användaren kombinera flera
   taggar till en feed (query-baserad URL, t.ex. `/feed/tags.xml?t=a,b`).
@@ -48,8 +56,6 @@ i artikellistan.
   nedanför sektionskorten på `/`. Visa dessutom en artikellista direkt på
   `/` (samma stil som `/articles`) under korten, så `/` blir en snabb
   "vad är nytt"-vy utan att behöva klicka vidare.
-- **Mobilgranskning av webui.** Verifiera att HTML-vyerna ser vettiga ut
-  och fungerar på mobil skärmbredd - hittills bara testat på desktop.
 
 ## Utanför scope
 

@@ -340,3 +340,23 @@ code {
 .section-links { columns: 2; max-width: 26rem; }
 .section-links li { text-transform: capitalize; }
 .back { text-decoration: none; }
+
+/* --- Mobil --- */
+@media (max-width: 560px) {
+  .wrap { padding: 0 1rem; }
+
+  /* Mobil: en liten bild floatar uppe till vänster och texten flödar runt
+     den - innehållet är i fokus, bilden är bara en thumbnail. Desktop
+     behåller flex-layouten (bild bredvid hela textspalten). */
+  .article { display: flow-root; }
+  .article-thumb {
+    float: left;
+    margin: 0.2rem 0.9rem 0.3rem 0;
+  }
+  .article-thumb img {
+    width: 110px;
+    height: 72px;
+  }
+
+  .section-links { columns: 1; }
+}
