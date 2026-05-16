@@ -19,6 +19,12 @@ backfill. Se `docs/SPEC.md` för fullständig spec.
   lita aldrig på den. Brödtext återpubliceras inte (innehållspolicy §7).
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
+- **Tagg-pills på artiklar.** Utöver `section_tag` bär artiklar ett
+  `tags`-fält - en komma-separerad sträng (t.ex. `"nattvard, debatt"`).
+  Visa dessa som klickbara pills i HTML-listan. `tags` lagras inte i dag:
+  kräver ny kolumn i `articles` (ALTER TABLE-guard i `init_db()`), fält i
+  `Article` och `map_article` (`db.py`), samt rendering i `list.html` +
+  `style.css`.
 
 ## Utanför scope
 
