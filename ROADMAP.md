@@ -34,8 +34,18 @@ HTML-gränssnitt, `/healthz`, Docker-deploy, manuell backfill. Se
   lita aldrig på den. Brödtext återpubliceras inte (innehållspolicy §7).
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
+- **Full backfill vid containerstart.** En env-variabel (t.ex.
+  `KT_RSS_BACKFILL_PAGES`) som vid uppstart triggar en backfill av arkivet.
+  Måste köras som bakgrundsuppgift, inte i `lifespan` - en full backfill tar
+  ~28 min och får inte blockera appstart eller `/healthz`. Behöver en "redan
+  klar"-markör så den inte kör om ~328 API-anrop vid varje containeromstart;
+  `backfill.py`:s resume-sidecar täcker delar av det.
+- **Paginering i HTML-vyerna.** Efter en full backfill rymmer `articles`
+  tiotusentals rader, men `/articles` och `/s/{section}` visar bara
+  `max_items`. Kräver `offset` i `get_articles` samt sid- eller
+  lazyload-navigering i `list.html`. Feeds berörs inte - de ska förbli
+  senaste N (RSS-konvention).
 
 ## Utanför scope
 
-Ingen auth (körs bakom egen proxy), ingen automatisk arkiv-backfill, ingen
-HTML-scraping, inga push-notiser.
+Ingen auth (körs bakom egen proxy), ingen HTML-scraping, inga push-notiser.
