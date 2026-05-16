@@ -122,6 +122,24 @@ def _known_tags(conn) -> list[str]:
     return [tag for tag, _ in list_tags(conn)]
 
 
+def _paginate(base_path: str, page: int, total: int, page_size: int) -> dict:
+    """Pagineringsdata för en HTML-lista.
+
+    Klampar `page` till giltigt intervall (out-of-bounds visar sista sidan),
+    ger `offset` för DB-frågan och `next_page` (None om sista). `base` används
+    av infinite scroll-JS för att hämta nästa batch.
+    """
+    total_pages = max(1, (total + page_size - 1) // page_size)
+    page = max(1, min(page, total_pages))
+    return {
+        "page": page,
+        "total_pages": total_pages,
+        "offset": (page - 1) * page_size,
+        "base": base_path,
+        "next_page": page + 1 if page < total_pages else None,
+    }
+
+
 # --------------------------------------------------------------------------
 # Feeds (XML)
 # --------------------------------------------------------------------------
@@ -204,9 +222,19 @@ def index(request: Request, conn_settings=Depends(get_conn_settings)):
 
 
 @app.get("/articles", response_class=HTMLResponse)
-def articles_all(request: Request, conn_settings=Depends(get_conn_settings)):
+def articles_all(
+    request: Request,
+    conn_settings=Depends(get_conn_settings),
+    page: int = Query(1, ge=1),
+    partial: int = Query(0),
+):
     conn, settings = conn_settings
-    articles = get_articles(conn, limit=settings.max_items)
+    pg = _paginate("/articles", page, count_articles(conn), settings.page_size)
+    articles = get_articles(conn, limit=settings.page_size, offset=pg["offset"])
+    if partial:
+        return templates.TemplateResponse(
+            request, "_articles.html", {"articles": articles}
+        )
     return templates.TemplateResponse(
         request,
         "list.html",
@@ -216,24 +244,38 @@ def articles_all(request: Request, conn_settings=Depends(get_conn_settings)):
             "section": None,
             "feed_path": "/feed.xml",
             "state": get_fetch_state(conn),
+            "pagination": pg,
         },
     )
 
 
 @app.get("/s/{section}", response_class=HTMLResponse)
 def articles_section(
-    section: str, request: Request, conn_settings=Depends(get_conn_settings)
+    section: str,
+    request: Request,
+    conn_settings=Depends(get_conn_settings),
+    page: int = Query(1, ge=1),
+    partial: int = Query(0),
 ):
     conn, settings = conn_settings
-    known = _known_sections(conn)
-    if section not in known:
+    counts = {r["section"]: r["count"] for r in list_sections(conn)}
+    if section not in counts:
         return templates.TemplateResponse(
             request,
             "notfound.html",
-            {"kind": "sektion", "name": section, "sections": known},
+            {"kind": "sektion", "name": section, "sections": list(counts)},
             status_code=404,
         )
-    articles = get_articles(conn, section=section, limit=settings.max_items)
+    pg = _paginate(
+        f"/s/{quote(section)}", page, counts[section], settings.page_size
+    )
+    articles = get_articles(
+        conn, section=section, limit=settings.page_size, offset=pg["offset"]
+    )
+    if partial:
+        return templates.TemplateResponse(
+            request, "_articles.html", {"articles": articles}
+        )
     return templates.TemplateResponse(
         request,
         "list.html",
@@ -243,24 +285,39 @@ def articles_section(
             "section": section,
             "feed_path": f"/feed/{section}.xml",
             "state": get_fetch_state(conn),
+            "pagination": pg,
         },
     )
 
 
 @app.get("/t/{tag}", response_class=HTMLResponse)
 def articles_tag(
-    tag: str, request: Request, conn_settings=Depends(get_conn_settings)
+    tag: str,
+    request: Request,
+    conn_settings=Depends(get_conn_settings),
+    page: int = Query(1, ge=1),
+    partial: int = Query(0),
 ):
     conn, settings = conn_settings
     tag_l = tag.strip().lower()
-    if tag_l not in _known_tags(conn):
+    counts = dict(list_tags(conn))
+    if tag_l not in counts:
         return templates.TemplateResponse(
             request,
             "notfound.html",
             {"kind": "tagg", "name": tag, "sections": _known_sections(conn)},
             status_code=404,
         )
-    articles = get_articles(conn, tag=tag_l, limit=settings.max_items)
+    pg = _paginate(
+        f"/t/{quote(tag_l)}", page, counts[tag_l], settings.page_size
+    )
+    articles = get_articles(
+        conn, tag=tag_l, limit=settings.page_size, offset=pg["offset"]
+    )
+    if partial:
+        return templates.TemplateResponse(
+            request, "_articles.html", {"articles": articles}
+        )
     return templates.TemplateResponse(
         request,
         "list.html",
@@ -271,6 +328,7 @@ def articles_tag(
             "tag": tag_l,
             "feed_path": f"/feed/t/{quote(tag_l)}.xml",
             "state": get_fetch_state(conn),
+            "pagination": pg,
         },
     )
 

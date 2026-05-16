@@ -31,8 +31,8 @@ kt_rss/
   feed.py         feedgen: Atom/RSS-serialisering
   backfill.py     valfri manuell CLI-backfill (spec §8.1)
   main.py         FastAPI-app: feeds, HTML-vyer, /healthz, lifespan
-  templates/      base.html, index.html, list.html, notfound.html
-  static/         style.css
+  templates/      base.html, index.html, list.html, _articles.html, notfound.html
+  static/         style.css, scroll.js (infinite scroll)
 tests/            offline mot tests/fixtures/article_response.json
 docs/SPEC.md      fullständig projektspecifikation
 ```

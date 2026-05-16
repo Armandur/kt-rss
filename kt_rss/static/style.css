@@ -341,6 +341,9 @@ code {
 .section-links li { text-transform: capitalize; }
 .back { text-decoration: none; }
 
+/* Infinite scroll-sentinel - tom, JS observerar den och laddar nästa batch. */
+.scroll-sentinel { padding: 1.5rem 0; }
+
 /* --- Mobil --- */
 @media (max-width: 560px) {
   .wrap { padding: 0 1rem; }

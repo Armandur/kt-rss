@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     public_url: str = "http://localhost:8000"
     max_fetch: int = 50
     max_items: int = 50
+    page_size: int = 50
     section_allowlist: str = ""
     include_image_enclosure: bool = True
     log_level: str = "INFO"

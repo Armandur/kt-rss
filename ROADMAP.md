@@ -27,6 +27,9 @@ i artikellistan.
 - **Mobilanpassning av webui.** På smal skärm (<560px) floatar en liten
   thumbnail uppe till vänster och texten flödar runt den; `.wrap`-padding
   och 404-sidans sektionslista justerade.
+- **Paginering / infinite scroll.** Artikellistorna laddar fler artiklar
+  automatiskt vid scroll - `scroll.js` hämtar nästa batch som HTML-fragment
+  (`?partial=1`). `KT_RSS_PAGE_SIZE` styr batchstorleken.
 
 ### Idéer (ej påbörjat)
 
@@ -47,11 +50,6 @@ i artikellistan.
   ~28 min och får inte blockera appstart eller `/healthz`. Behöver en "redan
   klar"-markör så den inte kör om ~328 API-anrop vid varje containeromstart;
   `backfill.py`:s resume-sidecar täcker delar av det.
-- **Paginering i HTML-vyerna.** Efter en full backfill rymmer `articles`
-  tiotusentals rader, men `/articles` och `/s/{section}` visar bara
-  `max_items`. Kräver `offset` i `get_articles` samt sid- eller
-  lazyload-navigering i `list.html`. Feeds berörs inte - de ska förbli
-  senaste N (RSS-konvention).
 - **Startsidan som snabb bläddringsvy.** Flytta "Alla artiklar"-kortet
   nedanför sektionskorten på `/`. Visa dessutom en artikellista direkt på
   `/` (samma stil som `/articles`) under korten, så `/` blir en snabb

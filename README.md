@@ -79,6 +79,7 @@ Se [`.env.example`](.env.example) för fullständig lista. De viktigaste:
 | `KT_RSS_PUBLIC_URL` | `http://localhost:8000` | Länkbas i feeds |
 | `KT_RSS_MAX_FETCH` | `50` | Artiklar per poll |
 | `KT_RSS_MAX_ITEMS` | `50` | Items per feed |
+| `KT_RSS_PAGE_SIZE` | `50` | Artiklar per sida i webui (infinite scroll) |
 | `KT_RSS_SECTION_ALLOWLIST` | (tom = alla) | Komma-separerade `section_tag` |
 | `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` | `true` | Artikelbild som enclosure i feeds |
 

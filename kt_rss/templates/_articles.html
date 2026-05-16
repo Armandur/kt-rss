@@ -1,0 +1,45 @@
+{#
+  Artikellistans rader. Inkluderas av list.html och renderas ensam av
+  paginerings-endpointerna (?partial=1) för infinite scroll.
+
+  Spec SS7: visar ALDRIG bodytext - bara rubrik, ingress, kicker, författare,
+  datum, artikelbild och länk ut till KT. Lägg inte till brödtext här.
+#}
+{% for a in articles %}
+{% set dag = a.published_at|sv_date %}
+{% if loop.first or dag != (loop.previtem.published_at|sv_date) %}
+<div class="day-sep">{{ dag }}</div>
+{% endif %}
+<article class="article">
+  {% if a.image_id %}
+  <a class="article-thumb" href="{{ a.url }}" target="_blank" rel="noopener">
+    <img src="{{ image_url(a.image_id, width=480, height=312) }}"
+         alt="" loading="lazy" decoding="async">
+  </a>
+  {% endif %}
+  <div class="article-body">
+    <div class="article-meta">
+      {% if a.kicker %}<span class="kicker">{{ a.kicker }}</span>{% endif %}
+      {% if a.author %}<span class="author">{{ a.author }}</span>{% endif %}
+    </div>
+    <h2 class="article-title">
+      <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.title }}</a>
+    </h2>
+    {% if a.subtitle %}<p class="article-sub">{{ a.subtitle }}</p>{% endif %}
+    {% if a.tags %}
+    <div class="tags">
+      {% for tag in a.tags.split(', ') %}
+      <a class="tag-pill" href="/t/{{ tag|urlencode }}">{{ tag }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <div class="article-foot">
+      <time datetime="{{ a.published_at }}">{{ a.published_at|sv_datetime }}</time>
+      {% if a.is_paywalled %}<span class="paywall">Betalartikel</span>{% endif %}
+      <a class="readlink" href="{{ a.url }}" target="_blank" rel="noopener">
+        Läs på kyrkanstidning.se &rarr;
+      </a>
+    </div>
+  </div>
+</article>
+{% endfor %}

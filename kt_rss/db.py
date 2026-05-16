@@ -268,28 +268,30 @@ def get_articles(
     section: str | None = None,
     tag: str | None = None,
     limit: int = 50,
+    offset: int = 0,
 ) -> list[sqlite3.Row]:
     """Artiklar sorterade på published_at fallande.
 
     Filtrerar på `section` eller `tag` om angivet. `tag` matchas mot en hel
     token i den ', '-joinade tags-kolumnen - inte som delsträng, så 'kyrka'
-    träffar inte 'svenska kyrkan'.
+    träffar inte 'svenska kyrkan'. `offset` hoppar förbi rader (paginering).
     """
     if tag is not None:
         return conn.execute(
             "SELECT * FROM articles "
             "WHERE instr(', ' || tags || ', ', ', ' || ? || ', ') > 0 "
-            "ORDER BY published_at DESC LIMIT ?",
-            (tag, limit),
+            "ORDER BY published_at DESC LIMIT ? OFFSET ?",
+            (tag, limit, offset),
         ).fetchall()
     if section is None:
         return conn.execute(
-            "SELECT * FROM articles ORDER BY published_at DESC LIMIT ?", (limit,)
+            "SELECT * FROM articles ORDER BY published_at DESC LIMIT ? OFFSET ?",
+            (limit, offset),
         ).fetchall()
     return conn.execute(
         "SELECT * FROM articles WHERE section = ? "
-        "ORDER BY published_at DESC LIMIT ?",
-        (section, limit),
+        "ORDER BY published_at DESC LIMIT ? OFFSET ?",
+        (section, limit, offset),
     ).fetchall()
 
 
