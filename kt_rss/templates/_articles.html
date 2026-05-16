@@ -35,7 +35,6 @@
     {% endif %}
     <div class="article-foot">
       <time datetime="{{ a.published_at }}">{{ a.published_at|sv_datetime }}</time>
-      {% if a.is_paywalled %}<span class="paywall">Betalartikel</span>{% endif %}
       <a class="readlink" href="{{ a.url }}" target="_blank" rel="noopener">
         Läs på kyrkanstidning.se &rarr;
       </a>

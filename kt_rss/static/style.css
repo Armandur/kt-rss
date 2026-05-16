@@ -335,15 +335,6 @@ code {
   color: var(--ink-soft);
 }
 
-.paywall {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.1rem 0.5rem;
-}
-
 .readlink { text-decoration: none; }
 .readlink:hover { text-decoration: underline; }
 
