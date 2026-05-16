@@ -47,6 +47,9 @@ i artikellistan.
   och ingress, utan ranking eller paginering. Uppslag: SQLite FTS5 för
   ordmatchning och relevans, sök även i taggar och författare, korrekt
   åäö-hantering, infinite scroll på resultaten.
+- **Bläddra via taggar.** En översiktsvy som listar alla taggar (taggmoln
+  eller sökbar lista) att klicka sig in i `/t/{tag}` från. I dag når man
+  taggvyerna bara via pills på artiklar eller `/tags`-feedbyggaren.
 - **Textutdrag i feed-summary.** Om det någonsin görs: använd `subtitle`
   som primär summary. `bodytext` är osäkert fullständig och varierar per
   artikeltyp (poddar har programtext, inte transkription - spec §2.1) -
