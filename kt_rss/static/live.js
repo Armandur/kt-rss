@@ -20,9 +20,13 @@
       banner.type = "button";
       banner.className = "live-banner";
       banner.addEventListener("click", function () {
+        // Ladda om vid #senaste-ankaret - de nya artiklarna börjar där,
+        // efter hero och sektionskort. Omladdningen behåller annars den
+        // nedscrollade positionen.
+        history.replaceState(null, "", "#senaste");
         location.reload();
       });
-      list.parentNode.insertBefore(banner, list);
+      document.body.appendChild(banner);
     }
     var ord = count === 1 ? "ny artikel" : "nya artiklar";
     banner.textContent = count + " " + ord + " - visa";
