@@ -119,18 +119,17 @@ i artikellistan.
   flytande pill `position: fixed` nära toppen, så den syns även när man
   scrollat ner i listan.
 
-## v5.1.3 (planerad)
+## v5.1.3 (klar)
 
-- **Infinite scroll på sökresultat.** *(klar)* `/search` paginerar nu som
-  de övriga listvyerna - `search_articles` fick en offset-parameter och
+- **Infinite scroll på sökresultat.** `/search` paginerar nu som de övriga
+  listvyerna - `search_articles` fick en offset-parameter och
   `count_search_results` räknar träffarna. Träfftexten visar totalen.
 - **Tangentbordsnavigering i sökförslagen.** Pil upp/ner markerar ett
-  förslag i autocomplete-dropdownen, Enter väljer det - i dag krävs
-  musklick.
-- **Feed-logga.** Atom- och RSS-feedsen får en feed-nivå-logga (`<logo>`/
-  `<icon>` respektive `<image>`) så de ser mer kompletta ut i RSS-läsare.
-- **Riktig favicon.** Ikonen är i dag en tom `data:,`-platshållare; ett
-  litet KT-monogram skulle synas i webbläsarflikar och RSS-läsare.
+  förslag i autocomplete-dropdownen, Enter väljer det.
+- **Feed-logga.** Atom-feedsen bär `<logo>`/`<icon>` och RSS `<image>`
+  med projektets logotyp.
+- **Riktig favicon.** Logotypen som SVG-favicon med PNG-fallback och
+  apple-touch-icon; den tomma `data:,`-platshållaren är borta.
 
 ## Längre fram (ej versionsbundet)
 
