@@ -18,7 +18,7 @@ aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/s/{section}` | Stylead HTML-lista per sektion |
 | `/t` | Taggöversikt - taggmoln att bläddra från |
 | `/t/{tag}` | Stylead HTML-lista per tagg |
-| `/a` | Skribentöversikt - sökbar lista att bläddra från |
+| `/a` | Skribentöversikt - sökbar lista, delad i redaktion och debatt |
 | `/a/{author}` | Stylead HTML-lista per skribent |
 | `/tags` | Bygg en feed på flera taggar (sök + kryssrutor) |
 | `/search` | Sök artiklar på rubrik och ingress (`?q=`) |

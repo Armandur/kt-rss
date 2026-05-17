@@ -4,7 +4,14 @@ from dataclasses import replace
 
 from fastapi.testclient import TestClient
 
-from kt_rss.db import connect, get_articles, list_authors, map_article, upsert_article
+from kt_rss.db import (
+    connect,
+    get_articles,
+    list_authors,
+    list_authors_split,
+    map_article,
+    upsert_article,
+)
 from kt_rss.main import app, get_conn_settings
 
 BASE = "https://www.kyrkanstidning.se"
@@ -38,6 +45,21 @@ def test_clean_authors_tvattar_byline(db_path, raw_articles):
     # ' och ' räknas som avgränsare (svensk byline-konvention).
     assert _clean_authors("Anna Andersson och Per Persson") == "Anna Andersson, Per Persson"
     assert _clean_authors("Anna A, Per P och Karl K") == "Anna A, Per P, Karl K"
+
+
+def test_list_authors_split(db_path, raw_articles):
+    base = map_article(raw_articles[0], BASE)
+    conn = connect(db_path)
+    upsert_article(conn, replace(base, id="n1", section="nyhet", author="Reporter R"))
+    upsert_article(conn, replace(base, id="d1", section="debatt", author="Debattör D"))
+    # Skribent i både nyhet och debatt -> redaktionell (en redaktionell räcker).
+    upsert_article(conn, replace(base, id="n2", section="nyhet", author="Blandad B"))
+    upsert_article(conn, replace(base, id="d2", section="debatt", author="Blandad B"))
+    conn.commit()
+    red, deb = list_authors_split(conn, {"debatt"})
+    assert dict(red) == {"Reporter R": 1, "Blandad B": 2}
+    assert dict(deb) == {"Debattör D": 1}
+    conn.close()
 
 
 def test_route_author(db_path, settings, raw_articles):

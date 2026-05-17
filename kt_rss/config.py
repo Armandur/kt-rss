@@ -17,6 +17,12 @@ MIN_POLL_MINUTES = 15
 # KT:s bild-API. Dokumenterat för v2 (bild-enclosure), ej använt i v1-feeden.
 IMAGE_API_BASE = "https://image.kyrkanstidning.se"
 
+# section_tag-värden som räknas som debatt/insändare snarare än redaktionellt
+# innehåll. Styr uppdelningen i skribentöversikten /a: en skribent som bara
+# förekommit i dessa sektioner listas under "Debatt och insändare", övriga
+# under "Redaktionen". Matchas skiftlägesokänsligt.
+DEBATE_SECTIONS = {"debatt", "insändare", "minnesord"}
+
 
 class Settings(BaseSettings):
     """Läses från miljön med prefix KT_RSS_ (eller .env-fil)."""

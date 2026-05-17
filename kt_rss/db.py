@@ -459,6 +459,33 @@ def list_authors(conn: sqlite3.Connection) -> list[tuple[str, int]]:
     return sorted(counts.items())
 
 
+def list_authors_split(
+    conn: sqlite3.Connection, debate_sections: set[str]
+) -> tuple[list[tuple[str, int]], list[tuple[str, int]]]:
+    """Skribenter delade i redaktionella och debatt/insändare.
+
+    En skribent räknas som redaktionell så snart hen har minst en artikel i
+    en sektion utanför `debate_sections`; den som bara förekommit i debatt-/
+    insändarsektioner hamnar under debatt. Returnerar (redaktion, debatt),
+    var och en sorterad [(namn, antal)] - antalet är skribentens totala.
+    """
+    counts: dict[str, int] = {}
+    editorial: set[str] = set()
+    for row in conn.execute(
+        "SELECT author, section FROM articles WHERE author <> ''"
+    ):
+        is_editorial = (row["section"] or "").lower() not in debate_sections
+        for name in row["author"].split(", "):
+            if not name:
+                continue
+            counts[name] = counts.get(name, 0) + 1
+            if is_editorial:
+                editorial.add(name)
+    red = sorted((n, c) for n, c in counts.items() if n in editorial)
+    deb = sorted((n, c) for n, c in counts.items() if n not in editorial)
+    return red, deb
+
+
 def list_tags(conn: sqlite3.Connection) -> list[tuple[str, int]]:
     """Alla taggar med artikelantal, härlett ur den tvättade tags-kolumnen."""
     counts: dict[str, int] = {}

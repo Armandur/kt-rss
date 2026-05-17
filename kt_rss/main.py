@@ -24,7 +24,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from kt_rss.backfill import maybe_start_backfill
-from kt_rss.config import Settings, get_settings
+from kt_rss.config import DEBATE_SECTIONS, Settings, get_settings
 from kt_rss.db import (
     connect,
     count_articles,
@@ -33,6 +33,7 @@ from kt_rss.db import (
     get_fetch_state,
     init_db,
     list_authors,
+    list_authors_split,
     list_sections,
     list_tags,
     search_articles,
@@ -425,10 +426,15 @@ def articles_tag(
 @app.get("/a", response_class=HTMLResponse)
 def author_index(request: Request, conn_settings=Depends(get_conn_settings)):
     conn, settings = conn_settings
+    editorial, debate = list_authors_split(conn, DEBATE_SECTIONS)
     return templates.TemplateResponse(
         request,
         "author_index.html",
-        {"authors": list_authors(conn), "state": get_fetch_state(conn)},
+        {
+            "editorial": editorial,
+            "debate": debate,
+            "state": get_fetch_state(conn),
+        },
     )
 
 

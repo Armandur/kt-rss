@@ -1,6 +1,20 @@
 {% extends "base.html" %}
 {% block title %}KT-RSS | Skribenter{% endblock %}
 
+{% macro author_group(rubrik, namn) %}
+<section class="author-group">
+  <h2>{{ rubrik }}</h2>
+  <ul class="author-list">
+    {% for name, count in namn %}
+    <li data-name="{{ name }}">
+      <a href="/a/{{ name|urlencode }}">{{ name }}</a>
+      <span class="author-count">{{ count }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endmacro %}
+
 {% block content %}
 <nav class="crumbs">
   <a href="/">Start</a><span>/</span><span class="here">Skribenter</span>
@@ -12,22 +26,17 @@
 
 <p class="lead">
   Alla skribenter i arkivet. Klicka på ett namn för att läsa deras
-  artiklar eller prenumerera på en feed.
+  artiklar eller prenumerera på en feed. Redaktionens skribenter står
+  först, debatt- och insändarbylines för sig.
 </p>
 
-{% if not authors %}
+{% if not editorial and not debate %}
 <p class="empty">Inga skribenter än. Listan fylls vid nästa poll.</p>
 {% else %}
 <input type="search" class="author-search"
        placeholder="Sök skribent&hellip;" autocomplete="off">
-<ul class="author-list">
-  {% for name, count in authors %}
-  <li data-name="{{ name }}">
-    <a href="/a/{{ name|urlencode }}">{{ name }}</a>
-    <span class="author-count">{{ count }}</span>
-  </li>
-  {% endfor %}
-</ul>
+{% if editorial %}{{ author_group("Redaktionen", editorial) }}{% endif %}
+{% if debate %}{{ author_group("Debatt och insändare", debate) }}{% endif %}
 {% endif %}
 {% endblock %}
 

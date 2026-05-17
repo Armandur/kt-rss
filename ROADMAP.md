@@ -68,8 +68,9 @@ i artikellistan.
   analogt med tagg-vyerna. `byline_names` tvättas till enskilda namn
   (`_clean_authors` delar på komma och ` och `) så en flerskribent-artikel
   listas under var och en av sina skribenter. Skribentöversikten `/a` är en
-  sökbar lista att bläddra från, och författarnamnet i varje artikel är en
-  länk till skribentens vy.
+  sökbar lista, delad i redaktionella skribenter och debatt-/insändarbylines
+  (`DEBATE_SECTIONS`), och författarnamnet i varje artikel är en länk till
+  skribentens vy.
 
 ### Idéer (ej påbörjat)
 

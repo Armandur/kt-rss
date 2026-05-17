@@ -88,7 +88,9 @@ alla sektionsfeeds. HTML-vyerna har
 feed-autodiscovery (`<link rel="alternate">`) styrt av `feed_path`. Sektioner och taggar är datadrivna (`section_tag` respektive den
 tvättade `tags`-kolumnen) - hårdkoda aldrig listorna. Taggar tvättas i
 `map_article` (`_clean_tags`); skribenter likaså (`_clean_authors` delar
-flerskribent-bylines på komma och ` och `). `/feed/tags.xml` måste registreras före
+flerskribent-bylines på komma och ` och `). Skribentöversikten `/a` delar
+skribenter i redaktion och debatt/insändare utifrån `DEBATE_SECTIONS` i
+`config.py`. `/feed/tags.xml` måste registreras före
 `/feed/{section}.xml` (annars matchas "tags" som ett section-värde).
 
 ## Vanliga ändringar
