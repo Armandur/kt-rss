@@ -11,6 +11,7 @@ URL-schema:
 
 from __future__ import annotations
 
+import hashlib
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -176,33 +177,42 @@ def _paginate(base_path: str, page: int, total: int, page_size: int) -> dict:
 # Feeds (XML)
 # --------------------------------------------------------------------------
 
-def _feed_response(xml: bytes, fmt: str) -> Response:
+def _feed_response(request: Request, xml: bytes, fmt: str) -> Response:
+    """Feed-svar med ETag - svarar 304 om klienten redan har samma innehåll.
+
+    ETag är en hash av den serialiserade feeden; build_feed är deterministisk,
+    så den ändras precis när feedinnehållet gör det. En RSS-läsare som ekar
+    tillbaka ETag:en i If-None-Match får 304 utan kropp och sparar bandbredd.
+    """
     media = (
         "application/rss+xml; charset=utf-8"
         if fmt == "rss"
         else "application/atom+xml; charset=utf-8"
     )
-    return Response(
-        content=xml,
-        media_type=media,
-        headers={"Cache-Control": "public, max-age=600"},
-    )
+    etag = '"' + hashlib.md5(xml, usedforsecurity=False).hexdigest() + '"'
+    headers = {"ETag": etag, "Cache-Control": "public, max-age=600"}
+    inm = request.headers.get("if-none-match", "")
+    if etag in {t.strip() for t in inm.split(",")}:
+        return Response(status_code=304, headers=headers)
+    return Response(content=xml, media_type=media, headers=headers)
 
 
 @app.get("/feed.xml")
 def feed_all(
+    request: Request,
     conn_settings=Depends(get_conn_settings),
     fmt: str = Query("atom", pattern="^(atom|rss)$"),
 ) -> Response:
     conn, settings = conn_settings
     articles = get_articles(conn, limit=settings.max_items)
-    return _feed_response(build_feed(settings, articles, fmt=fmt), fmt)
+    return _feed_response(request, build_feed(settings, articles, fmt=fmt), fmt)
 
 
 # Statisk route - måste stå före /feed/{section}.xml (annars matchar
 # "tags" som ett section-värde).
 @app.get("/feed/tags.xml")
 def feed_tags(
+    request: Request,
     conn_settings=Depends(get_conn_settings),
     t: str = Query(""),
     mode: str = Query("or", pattern="^(or|and)$"),
@@ -223,13 +233,14 @@ def feed_tags(
         conn, tags, mode=mode, limit=settings.max_items
     )
     return _feed_response(
-        build_feed(settings, articles, tags=tags, mode=mode, fmt=fmt), fmt
+        request, build_feed(settings, articles, tags=tags, mode=mode, fmt=fmt), fmt
     )
 
 
 @app.get("/feed/{section}.xml")
 def feed_section(
     section: str,
+    request: Request,
     conn_settings=Depends(get_conn_settings),
     fmt: str = Query("atom", pattern="^(atom|rss)$"),
 ) -> Response:
@@ -241,12 +252,15 @@ def feed_section(
             content={"error": f"okänd sektion: {section}", "valid_sections": known},
         )
     articles = get_articles(conn, section=section, limit=settings.max_items)
-    return _feed_response(build_feed(settings, articles, section=section, fmt=fmt), fmt)
+    return _feed_response(
+        request, build_feed(settings, articles, section=section, fmt=fmt), fmt
+    )
 
 
 @app.get("/feed/t/{tag}.xml")
 def feed_tag(
     tag: str,
+    request: Request,
     conn_settings=Depends(get_conn_settings),
     fmt: str = Query("atom", pattern="^(atom|rss)$"),
 ) -> Response:
@@ -259,12 +273,15 @@ def feed_tag(
             content={"error": f"okänd tagg: {tag}", "valid_tags": known},
         )
     articles = get_articles(conn, tag=tag_l, limit=settings.max_items)
-    return _feed_response(build_feed(settings, articles, tag=tag_l, fmt=fmt), fmt)
+    return _feed_response(
+        request, build_feed(settings, articles, tag=tag_l, fmt=fmt), fmt
+    )
 
 
 @app.get("/feed/a/{author}.xml")
 def feed_author(
     author: str,
+    request: Request,
     conn_settings=Depends(get_conn_settings),
     fmt: str = Query("atom", pattern="^(atom|rss)$"),
 ) -> Response:
@@ -275,7 +292,7 @@ def feed_author(
         )
     articles = get_articles(conn, author=author, limit=settings.max_items)
     return _feed_response(
-        build_feed(settings, articles, author=author, fmt=fmt), fmt
+        request, build_feed(settings, articles, author=author, fmt=fmt), fmt
     )
 
 

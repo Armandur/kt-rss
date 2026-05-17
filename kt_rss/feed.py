@@ -81,10 +81,15 @@ def _parse(dt: str | None) -> datetime | None:
 
 
 def _feed_updated(articles: list[sqlite3.Row]) -> datetime:
-    """Feed-`updated` = senaste last_seen/published_at i urvalet (spec SS9)."""
+    """Feed-`updated` = senaste publicering/ändring i urvalet (spec SS9).
+
+    Bygger på published_at och modified_at, inte last_seen: last_seen bumpas
+    vid varje poll och skulle få feedens <updated> - och därmed ETag:en i
+    _feed_response - att skifta utan att innehållet faktiskt ändrats.
+    """
     newest: datetime | None = None
     for a in articles:
-        for candidate in (_parse(a["published_at"]), _parse(a["last_seen"])):
+        for candidate in (_parse(a["published_at"]), _parse(a["modified_at"])):
             if candidate and (newest is None or candidate > newest):
                 newest = candidate
     return newest or datetime.now(timezone.utc)

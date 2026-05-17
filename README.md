@@ -32,6 +32,9 @@ aldrig (se [Innehållspolicy](#innehållspolicy)).
 
 Sektioner härleds från datan (`section_tag`) - inget hårdkodas.
 
+Feed-svaren bär en `ETag`; en RSS-läsare som skickar `If-None-Match` får
+`304 Not Modified` utan kropp när inget ändrats sedan förra hämtningen.
+
 ## Köra lokalt (dev-VM)
 
 Kräver Python 3.12+ och [uv](https://docs.astral.sh/uv/).

@@ -71,18 +71,19 @@ i artikellistan.
   sökbar lista, delad i redaktionella skribenter och debatt-/insändarbylines
   (`DEBATE_SECTIONS`), och författarnamnet i varje artikel är en länk till
   skribentens vy.
+- **Conditional requests på egna feeds.** Feed-svaren bär en `ETag` (hash av
+  det serialiserade innehållet); en RSS-läsare som ekar tillbaka den i
+  `If-None-Match` får `304 Not Modified` utan kropp och sparar bandbredd.
+  `_feed_response` i `main.py`. Klient-sidan mot KT:s API - att *skicka*
+  validatorer och hantera 304 - fanns redan i `api_client`/`poller`.
 
 ### Idéer (ej påbörjat)
 
 Prioordning enligt nedan.
 
-1. **Conditional requests på egna feeds.** Skicka `ETag`/`Last-Modified` på
-   feed-svaren och svara `304` på `If-None-Match`/`If-Modified-Since` -
-   sparar bandbredd för prenumeranterna. Skilt från Längre fram-punkten
-   med samma namn, som rör kt-rss *som klient* mot KT.
-2. **Datumarkiv.** `/archive/{år}/{månad}` för att bläddra äldre artiklar
+1. **Datumarkiv.** `/archive/{år}/{månad}` för att bläddra äldre artiklar
    per period - användbart nu när arkivet är tiotusentals artiklar.
-3. **Status- och statistiksida.** En HTML-vy med pollhistorik, artikelantal
+2. **Status- och statistiksida.** En HTML-vy med pollhistorik, artikelantal
    per sektion/tagg och DB-storlek - insyn utöver `/healthz`.
 
 ## Längre fram (ej versionsbundet)

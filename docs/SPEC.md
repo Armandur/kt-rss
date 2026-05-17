@@ -361,12 +361,15 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
   rel="enclosure">` (Atom) när `image_id` finns och
   `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` är på.
 - Sortering `published_at` fallande, max `KT_RSS_MAX_ITEMS`.
-- Feed-`updated` = max `last_seen`/`published_at` i urvalet.
+- Feed-`updated` = senaste `published_at`/`modified_at` i urvalet (inte
+  `last_seen`, som bumpas vid varje poll och skulle skifta `ETag`:en i onödan).
 - HTML-listorna (`/articles`, `/s/`, `/t/`) paginerar `KT_RSS_PAGE_SIZE`
   artiklar per `?page=N`; webui laddar nästa sida via infinite scroll
   (`?partial=1` ger ett HTML-fragment utan sidram).
 - Okänd `{section}` → 404 + lista giltiga sektioner.
 - `Cache-Control: public, max-age=600` på feeds.
+- Feed-svaren bär en `ETag` (hash av det serialiserade innehållet); en
+  begäran med matchande `If-None-Match` ger `304 Not Modified` utan kropp.
 - `/healthz` → 200 om appen lever; `last_successful_poll`, `article_count`,
   `total_count_remote`, `last_status`, `sections` (per-sektion antal).
 
