@@ -555,3 +555,15 @@ def list_tags(conn: sqlite3.Connection) -> list[tuple[str, int]]:
 def count_articles(conn: sqlite3.Connection) -> int:
     """Totalt antal lagrade artiklar."""
     return conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()["c"]
+
+
+def count_articles_after(conn: sqlite3.Connection, after: str) -> int:
+    """Antal artiklar med published_at strikt efter `after` (ISO 8601).
+
+    Driver liveuppdateringen: en öppen flik frågar hur många nyare artiklar
+    som tillkommit sedan den laddades.
+    """
+    return conn.execute(
+        "SELECT COUNT(*) AS c FROM articles WHERE published_at > ?",
+        (after,),
+    ).fetchone()["c"]

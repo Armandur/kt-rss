@@ -42,7 +42,7 @@ kt_rss/
                   tag_index.html, author_index.html, archive_index.html,
                   status.html, search.html, notfound.html
   static/         style.css, scroll.js, feedbuilder.js, theme.js, tagcloud.js,
-                  authors.js, newsince.js, suggest.js
+                  authors.js, newsince.js, suggest.js, live.js
 tests/            offline mot tests/fixtures/article_response.json
 docs/SPEC.md      fullständig projektspecifikation
 ```
@@ -93,6 +93,7 @@ timeout + få retries, endast GET. Se `api_client.py` och spec §3.
 + `/archive/{år}/{månad}` HTML-listor, `/t` taggöversikt, `/a`
 skribentöversikt, `/archive` arkivöversikt, `/tags` bygg-en-feed-vy,
 `/search` artikelsök, `/suggest` (JSON-autocomplete för sökrutan),
+`/latest` (JSON: antal nyare artiklar, driver liveuppdateringen),
 `/status` status-/statistiksida, `/feed.xml` +
 `/feed/{section}.xml` + `/feed/t/{tag}.xml` +
 `/feed/a/{author}.xml` + `/feed/tags.xml` (flera taggar,

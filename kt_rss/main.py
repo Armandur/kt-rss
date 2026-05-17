@@ -30,6 +30,7 @@ from kt_rss.config import DEBATE_SECTIONS, Settings, get_settings
 from kt_rss.db import (
     connect,
     count_articles,
+    count_articles_after,
     get_articles,
     get_articles_for_tags,
     get_fetch_state,
@@ -663,6 +664,18 @@ def suggest(
     tags = [t for t, _ in list_tags(conn) if term in t][:6]
     authors = [a for a, _ in list_authors(conn) if term in a.lower()][:6]
     return JSONResponse({"tags": tags, "authors": authors})
+
+
+@app.get("/latest")
+def latest(
+    conn_settings=Depends(get_conn_settings),
+    after: str = Query(""),
+) -> JSONResponse:
+    """Antal artiklar publicerade efter `after` - driver liveuppdateringen."""
+    conn, _ = conn_settings
+    after = after.strip()
+    count = count_articles_after(conn, after) if after else 0
+    return JSONResponse({"count": count})
 
 
 # --------------------------------------------------------------------------

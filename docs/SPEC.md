@@ -363,6 +363,7 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 | GET   | `/tags`               | HTML: bygg en feed på flera taggar                |
 | GET   | `/search`             | HTML: FTS5-sök på titel/ingress/taggar (`?q=`)    |
 | GET   | `/suggest`            | JSON: tagg-/skribentförslag för sökrutan (`?q=`)  |
+| GET   | `/latest`             | JSON: antal artiklar publicerade efter `?after=`  |
 | GET   | `/status`             | HTML: pollningstillstånd och arkivstatistik       |
 
 - Atom (RSS 2.0 via `?fmt=rss`). `Content-Type:

@@ -81,30 +81,29 @@ i artikellistan.
   artikelantal totalt och per sektion, vanligaste taggar, skribent- och
   periodspann samt databasstorlek. Headerns poll-status länkar dit.
 
-## v5.1.0 (pågår)
+## v5.1.0 (klar)
 
-Prioordning enligt nedan.
-
-1. **Sök-feed.** *(klar)* `/feed/search.xml?q=...` - prenumerera på en
-   sökterm. Kopplar FTS5-söket till feed-bygget, analogt med multi-tagg-
-   feeden. `/search`-sidan pekar ut sökningen med feed-autodiscovery och
-   en feed-badge.
-2. **Taggar som `<category>` i feed-items.** *(klar)* Feeden sätter redan
-   sektionen som kategori; artikelns tvättade taggar följer nu med så
-   RSS-läsare kan filtrera på dem.
-3. **Nytt sedan senaste besök.** *(klar)* Webui markerar artiklar som
-   tillkommit sedan förra besöket med en "Ny"-pill (`newsince.js`).
-   Jämförelsepunkten fryses per session; `localStorage` minns besöket.
-4. **Pollhistorik på statussidan.** *(klar)* En `poll_log`-tabell (tid,
-   status, hämtade/nya/uppdaterade) ger en lista över de senaste rundorna,
-   och en stapelgraf visar artiklar per månad de senaste året.
-5. **Sökförslag.** *(klar)* `/suggest` ger taggar och skribenter som
-   matchar; `suggest.js` visar dem i en dropdown under sökrutan och ett
-   klick navigerar till tagg- eller skribentvyn.
-6. **Liveuppdatering av öppen sida.** En öppen flik visar nya artiklar
-   utan omladdning - frågar periodiskt en endpoint om det finns nyare och
-   infogar dem överst (med "Ny"-pill). Lättare än webbläsarnotiser, ingen
-   service worker.
+- **Sök-feed.** `/feed/search.xml?q=...` - prenumerera på en sökterm.
+  Kopplar FTS5-söket till feed-bygget, analogt med multi-tagg-feeden.
+  `/search`-sidan pekar ut sökningen med feed-autodiscovery och en
+  feed-badge.
+- **Taggar som `<category>` i feed-items.** Feeden sätter redan sektionen
+  som kategori; artikelns tvättade taggar följer med så RSS-läsare kan
+  filtrera på dem.
+- **Nytt sedan senaste besök.** Webui markerar artiklar som tillkommit
+  sedan förra besöket med en "Ny"-pill (`newsince.js`). Jämförelsepunkten
+  fryses per session; `localStorage` minns besöket.
+- **Pollhistorik på statussidan.** En `poll_log`-tabell (tid, status,
+  hämtade/nya/uppdaterade) ger en lista över de senaste rundorna, och en
+  stapelgraf visar artiklar per månad de senaste året.
+- **Sökförslag.** `/suggest` ger taggar och skribenter som matchar;
+  `suggest.js` visar dem i en dropdown under sökrutan och ett klick
+  navigerar till tagg- eller skribentvyn.
+- **Liveuppdatering av öppen sida.** Startsidan frågar `/latest` med
+  jämna mellanrum om det kommit nyare artiklar och visar då en banner;
+  ett klick laddar om sidan, varpå de nya får sin "Ny"-pill (`live.js`).
+- **Prenumerera-knapp.** Startsidan länkar till Kyrkans Tidnings
+  prenumerationssida - hela artiklar finns hos KT.
 
 ## Längre fram (ej versionsbundet)
 

@@ -392,6 +392,26 @@ code {
   border-bottom: 2px solid var(--accent);
 }
 
+/* Liveuppdaterings-banner (live.js) - klick laddar om startsidan. */
+.live-banner {
+  display: block;
+  width: 100%;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 1rem 0 0;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--paper);
+  text-align: center;
+}
+.live-banner:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+
 /* Dag-rubrik som grupperar artiklarna datum för datum. */
 .day-sep {
   font-family: var(--serif);
