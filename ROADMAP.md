@@ -119,6 +119,20 @@ i artikellistan.
   flytande pill `position: fixed` nära toppen, så den syns även när man
   scrollat ner i listan.
 
+## v5.1.3 (planerad)
+
+- **Infinite scroll på sökresultat.** `/search` visar i dag bara de
+  första träffarna och stannar där. `search_articles` får en
+  offset-parameter och `/search`-routen paginering, som de övriga
+  listvyerna.
+- **Tangentbordsnavigering i sökförslagen.** Pil upp/ner markerar ett
+  förslag i autocomplete-dropdownen, Enter väljer det - i dag krävs
+  musklick.
+- **Feed-logga.** Atom- och RSS-feedsen får en feed-nivå-logga (`<logo>`/
+  `<icon>` respektive `<image>`) så de ser mer kompletta ut i RSS-läsare.
+- **Riktig favicon.** Ikonen är i dag en tom `data:,`-platshållare; ett
+  litet KT-monogram skulle synas i webbläsarflikar och RSS-läsare.
+
 ## Längre fram (ej versionsbundet)
 
 - **Webbläsarnotiser.** Notis när nya artiklar dykt upp (eller annat
