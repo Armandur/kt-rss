@@ -15,6 +15,11 @@
            autocomplete="off">
     <button type="submit">Sök</button>
   </form>
+  {% if articles %}
+  <a class="jump-latest" href="#senaste">
+    Senaste artiklarna <span class="arrow" aria-hidden="true">&darr;</span>
+  </a>
+  {% endif %}
 </section>
 
 <details class="sections-toggle">
@@ -68,7 +73,7 @@
 {% endif %}
 
 {% if articles %}
-<h2 class="home-heading">Senaste artiklarna</h2>
+<h2 class="home-heading" id="senaste">Senaste artiklarna</h2>
 <div class="articles">
   {% include "_articles.html" %}
 </div>

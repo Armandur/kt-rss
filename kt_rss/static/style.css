@@ -41,6 +41,7 @@
 * { box-sizing: border-box; }
 
 html, body { margin: 0; }
+html { scroll-behavior: smooth; }
 
 body {
   background: var(--paper);
@@ -179,6 +180,26 @@ code {
   background: var(--accent-soft);
   border-color: var(--accent-soft);
 }
+
+/* Genväg till "Senaste artiklarna" - bara desktop, där sektionskorten
+   fälls ut och annars skjuter listan långt ned. */
+.jump-latest {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.1rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.92rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+.jump-latest:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.jump-latest .arrow { font-size: 1.05em; line-height: 1; }
 
 /* --- Sektionskort --- */
 .cards {
@@ -637,4 +658,5 @@ code {
   .section-links { columns: 1; }
   .author-list,
   .archive-months { columns: 1; }
+  .jump-latest { display: none; }
 }
