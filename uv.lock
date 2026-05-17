@@ -237,7 +237,7 @@ wheels = [
 
 [[package]]
 name = "kt-rss"
-version = "4.0.1"
+version = "5.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "apscheduler" },
