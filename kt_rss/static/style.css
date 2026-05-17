@@ -242,6 +242,28 @@ code {
 }
 .jump-latest .arrow { font-size: 1.05em; line-height: 1; }
 
+/* Prenumerera-uppmaning - kt-rss visar bara ingresser, hela artiklar
+   finns hos Kyrkans Tidning. */
+.hero-note {
+  margin-top: 1.4rem;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+.kt-subscribe {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+.kt-subscribe:hover {
+  background: var(--accent);
+  color: var(--paper);
+}
+
 /* --- Sektionskort --- */
 .cards {
   display: grid;
