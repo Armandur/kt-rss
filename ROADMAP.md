@@ -105,6 +105,13 @@ i artikellistan.
 - **Prenumerera-knapp.** Startsidan länkar till Kyrkans Tidnings
   prenumerationssida - hela artiklar finns hos KT.
 
+## v5.1.1 (planerad)
+
+- **Månadsnavigering i datumarkivet.** `/archive/{år}/{månad}` får länkar
+  till föregående och nästa månad, placerade både högst upp och längst ned
+  på sidan, så man kan bläddra vidare till en angränsande månad när man
+  läst klart artiklarna.
+
 ## Längre fram (ej versionsbundet)
 
 - **Webbläsarnotiser.** Notis när nya artiklar dykt upp (eller annat
