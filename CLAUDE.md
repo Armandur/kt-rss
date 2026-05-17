@@ -47,6 +47,8 @@ kolumnändringar görs med `ALTER TABLE`-guards i `init_db()`.
   finns medvetet INTE (innehållspolicy, se nedan).
 - `fetch_state` - en rad (`key='default'`): pollningstillstånd, `last_status`,
   `total_count` m.m.
+- `articles_fts` - FTS5-fulltextindex (external content mot `articles`,
+  triggersynkat) för `/search`. `init_db()` kör `'rebuild'` vid start.
 
 Dedup: `upsert_article()` rör aldrig `first_seen`; uppdaterar `last_seen`
 varje runda och `title`/`subtitle`/`modified_at` vid ändring.

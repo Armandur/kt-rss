@@ -260,6 +260,11 @@ pytest. **Ingen HTML-parser.** Minimala dependencies.
 `key` PK, `etag`, `last_modified`, `last_run_at`, `last_count`,
 `last_status` (`ok`/`skipped_304`/`error`/`sanity_failed`), `total_count`.
 
+### FTS5-index `articles_fts`
+Virtuell FTS5-tabell (external content mot `articles`) som indexerar
+`title`, `subtitle`, `tags`, `author` för `/search`. Triggrar på `articles`
+håller indexet synkat; `init_db` kör `'rebuild'` vid start.
+
 **Dedup:** `id` är PK. Återkommande artikel uppdaterar `last_seen` (och
 ändrade fält som `modified_at`/`title`/`subtitle`/`tags`/`image_id`);
 `first_seen` rörs aldrig. URL byggs en gång vid insert; strippa ev.
@@ -341,7 +346,7 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 | GET   | `/t`                  | HTML: taggöversikt (taggmoln)                     |
 | GET   | `/t/{tag}`            | HTML-lista filtrerad på en tvättad tagg           |
 | GET   | `/tags`               | HTML: bygg en feed på flera taggar                |
-| GET   | `/search`             | HTML: sök artiklar på titel/ingress (`?q=`)       |
+| GET   | `/search`             | HTML: FTS5-sök på titel/ingress/taggar (`?q=`)    |
 
 - Atom (RSS 2.0 via `?fmt=rss`). `Content-Type:
   application/atom+xml; charset=utf-8`.

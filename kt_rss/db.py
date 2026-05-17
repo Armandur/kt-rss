@@ -169,6 +169,45 @@ def init_db(db_path: str) -> None:
             conn.execute(
                 "ALTER TABLE articles ADD COLUMN image_id TEXT NOT NULL DEFAULT ''"
             )
+
+        # Fulltextindex (FTS5) för artikelsök. External content mot articles;
+        # triggrarna håller indexet synkat. Skapas efter ALTER-guardarna så
+        # att tags/author garanterat finns när triggrarna refererar dem.
+        conn.executescript(
+            """
+            CREATE VIRTUAL TABLE IF NOT EXISTS articles_fts USING fts5(
+                title, subtitle, tags, author,
+                content='articles', content_rowid='rowid'
+            );
+            CREATE TRIGGER IF NOT EXISTS articles_fts_ai
+              AFTER INSERT ON articles BEGIN
+                INSERT INTO articles_fts(rowid, title, subtitle, tags, author)
+                VALUES (new.rowid, new.title, new.subtitle, new.tags, new.author);
+            END;
+            CREATE TRIGGER IF NOT EXISTS articles_fts_ad
+              AFTER DELETE ON articles BEGIN
+                INSERT INTO articles_fts(articles_fts, rowid, title, subtitle,
+                                         tags, author)
+                VALUES ('delete', old.rowid, old.title, old.subtitle,
+                        old.tags, old.author);
+            END;
+            CREATE TRIGGER IF NOT EXISTS articles_fts_au
+              AFTER UPDATE ON articles BEGIN
+                INSERT INTO articles_fts(articles_fts, rowid, title, subtitle,
+                                         tags, author)
+                VALUES ('delete', old.rowid, old.title, old.subtitle,
+                        old.tags, old.author);
+                INSERT INTO articles_fts(rowid, title, subtitle, tags, author)
+                VALUES (new.rowid, new.title, new.subtitle, new.tags, new.author);
+            END;
+            """
+        )
+        # Bygg FTS-indexet från articles. 'rebuild' är det kanoniska sättet
+        # för en external-content-tabell - idempotent och billigt, så det
+        # körs vid varje init: fyller indexet när en databas uppgraderas
+        # från pre-FTS och rättar ev. drift. Triggrarna håller det sedan
+        # synkat löpande.
+        conn.execute("INSERT INTO articles_fts(articles_fts) VALUES('rebuild')")
         conn.commit()
     finally:
         conn.close()
@@ -320,23 +359,35 @@ def get_articles_for_tags(
     ).fetchall()
 
 
+def _fts_query(raw: str) -> str | None:
+    """Bygger en FTS5 MATCH-fras av användarinput.
+
+    Varje ord citeras så det tolkas som en literal term - inga FTS5-
+    operatorer (`OR`, `*`, `NEAR` ...) läcker in från användaren. Tokens som
+    själva innehåller citattecken släpps. Returnerar None om inget blir kvar.
+    """
+    parts = ['"' + t + '"' for t in raw.split() if t and '"' not in t]
+    return " ".join(parts) if parts else None
+
+
 def search_articles(
     conn: sqlite3.Connection, query: str, *, limit: int = 50
 ) -> list[sqlite3.Row]:
-    """Söker artiklar på titel och ingress, nyaste först.
+    """Fulltextsök på titel, ingress, taggar och författare (FTS5).
 
-    Substrängsökning via `instr` i stället för `LIKE` - då tolkas inte
-    `%`/`_` i söktermen som wildcards. ASCII-okänslig för versaler via
-    `lower()`. Tom sökterm ger tom lista.
+    Orden bildar en AND-sökning av literala termer; FTS5:s unicode61-
+    tokenizer ger korrekt versal- och åäö-hantering. Resultaten rankas på
+    relevans (bm25, lägre = mer relevant). Tom/ogiltig sökterm ger tom lista.
     """
-    q = query.strip().lower()
-    if not q:
+    match = _fts_query(query)
+    if match is None:
         return []
     return conn.execute(
-        "SELECT * FROM articles "
-        "WHERE instr(lower(title), ?) > 0 OR instr(lower(subtitle), ?) > 0 "
-        "ORDER BY published_at DESC LIMIT ?",
-        (q, q, limit),
+        "SELECT a.* FROM articles a "
+        "JOIN articles_fts ON articles_fts.rowid = a.rowid "
+        "WHERE articles_fts MATCH ? "
+        "ORDER BY bm25(articles_fts), a.published_at DESC LIMIT ?",
+        (match, limit),
     ).fetchall()
 
 
