@@ -1,3 +1,3 @@
 """kt-rss - RSS-feeds från Kyrkans Tidning."""
 
-__version__ = "5.1.2"
+__version__ = "5.1.3"

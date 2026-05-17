@@ -1,6 +1,6 @@
 [project]
 name = "kt-rss"
-version = "5.1.2"
+version = "5.1.3"
 description = "Genererar Atom/RSS-feeds från Kyrkans Tidnings interna JSON-API"
 requires-python = ">=3.12"
 dependencies = [
