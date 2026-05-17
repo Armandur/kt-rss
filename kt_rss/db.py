@@ -63,6 +63,24 @@ def _clean_tags(raw_tags: object, section: str) -> str:
     return ", ".join(seen)
 
 
+def _clean_authors(raw: object) -> str:
+    """Tvättar API:ets `byline_names` till en ', '-joinad lista av enskilda namn.
+
+    `byline_names` kan rymma flera skribenter, separerade med komma och -
+    för de två sista enligt svensk konvention - med ` och `. Båda räknas som
+    avgränsare. Varje namn trimmas och får inre whitespace kollapsad, tomma
+    delar släpps (en inledande komma i rådatan ger annars ett tomt namn) och
+    dubbletter tas bort. Versaler behålls - till skillnad från `_clean_tags`
+    är namn skiftlägeskänsliga. Returnerar tom sträng om inget blir kvar.
+    """
+    seen: list[str] = []
+    for part in str(raw or "").replace(" och ", ",").split(","):
+        name = " ".join(part.split())
+        if name and name not in seen:
+            seen.append(name)
+    return ", ".join(seen)
+
+
 @dataclass
 class Article:
     """En artikel mappad från API-svaret - de fält v1 faktiskt lagrar (SS6)."""
@@ -97,7 +115,7 @@ def map_article(raw: dict, base_url: str) -> Article:
         subtitle=str(raw.get("subtitle") or "").strip(),
         section=section,
         kicker=str(raw.get("kicker") or "").strip(),
-        author=str(raw.get("byline_names") or "").strip(),
+        author=_clean_authors(raw.get("byline_names")),
         published_at=str(raw.get("published") or "").strip(),
         modified_at=_modified_to_iso(raw.get("modified")),
         is_paywalled=1 if (paywall or internal) else 0,
@@ -168,6 +186,24 @@ def init_db(db_path: str) -> None:
         if "image_id" not in cols:
             conn.execute(
                 "ALTER TABLE articles ADD COLUMN image_id TEXT NOT NULL DEFAULT ''"
+            )
+
+        # Engångs-omtvätt av äldre author-värden. byline_names lagrades förr
+        # som rå sträng; _clean_authors tvättar bort inledande komma och
+        # inkonsekvent whitespace och delar flerskribent-bylines. Idempotent
+        # - bara rader som faktiskt ändras skrivs, så efter första körningen
+        # är den gratis. Görs före FTS-tabellen skapas: rebuild nedan plockar
+        # upp den tvättade datan utan trigger-churn.
+        dirty = [
+            (cleaned, r["id"])
+            for r in conn.execute(
+                "SELECT id, author FROM articles WHERE author <> ''"
+            )
+            if (cleaned := _clean_authors(r["author"])) != r["author"]
+        ]
+        if dirty:
+            conn.executemany(
+                "UPDATE articles SET author = ? WHERE id = ?", dirty
             )
 
         # Fulltextindex (FTS5) för artikelsök. External content mot articles;
@@ -314,8 +350,9 @@ def get_articles(
 
     Filtrerar på `section`, `tag` eller `author` om angivet. `tag` matchas
     mot en hel token i den ', '-joinade tags-kolumnen - inte som delsträng,
-    så 'kyrka' träffar inte 'svenska kyrkan'. `author` matchas exakt.
-    `offset` hoppar förbi rader (paginering).
+    så 'kyrka' träffar inte 'svenska kyrkan'. `author` matchas likadant mot
+    author-kolumnen, så en flerskribent-artikel träffas av var och en av
+    sina skribenter. `offset` hoppar förbi rader (paginering).
     """
     if tag is not None:
         return conn.execute(
@@ -326,7 +363,8 @@ def get_articles(
         ).fetchall()
     if author is not None:
         return conn.execute(
-            "SELECT * FROM articles WHERE author = ? "
+            "SELECT * FROM articles "
+            "WHERE instr(', ' || author || ', ', ', ' || ? || ', ') > 0 "
             "ORDER BY published_at DESC LIMIT ? OFFSET ?",
             (author, limit, offset),
         ).fetchall()
@@ -407,12 +445,18 @@ def list_sections(conn: sqlite3.Connection) -> list[sqlite3.Row]:
     ).fetchall()
 
 
-def list_authors(conn: sqlite3.Connection) -> list[sqlite3.Row]:
-    """Alla författare med artikelantal - datadrivet ur author-kolumnen."""
-    return conn.execute(
-        "SELECT author, COUNT(*) AS count FROM articles "
-        "WHERE author <> '' GROUP BY author ORDER BY author"
-    ).fetchall()
+def list_authors(conn: sqlite3.Connection) -> list[tuple[str, int]]:
+    """Alla skribenter med artikelantal, härlett ur author-kolumnen.
+
+    author rymmer flera komma-separerade namn; varje namn räknas för sig,
+    analogt med list_tags.
+    """
+    counts: dict[str, int] = {}
+    for row in conn.execute("SELECT author FROM articles WHERE author <> ''"):
+        for name in row["author"].split(", "):
+            if name:
+                counts[name] = counts.get(name, 0) + 1
+    return sorted(counts.items())
 
 
 def list_tags(conn: sqlite3.Connection) -> list[tuple[str, int]]:

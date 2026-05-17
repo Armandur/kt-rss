@@ -65,9 +65,11 @@ i artikellistan.
 - **OPML-export.** `/feeds.opml` listar alla sektionsfeeds (absoluta URL:er)
   för import i en RSS-läsare i ett svep.
 - **Författarvyer.** `/a/{author}` HTML-lista och `/feed/a/{author}.xml`,
-  analogt med sektionsvyerna (exakt match på `author`). Skribentöversikten
-  `/a` är en sökbar lista att bläddra från, och författarnamnet i varje
-  artikel är en länk till skribentens vy.
+  analogt med tagg-vyerna. `byline_names` tvättas till enskilda namn
+  (`_clean_authors` delar på komma och ` och `) så en flerskribent-artikel
+  listas under var och en av sina skribenter. Skribentöversikten `/a` är en
+  sökbar lista att bläddra från, och författarnamnet i varje artikel är en
+  länk till skribentens vy.
 
 ### Idéer (ej påbörjat)
 

@@ -41,7 +41,10 @@ docs/SPEC.md      fullständig projektspecifikation
 ## Datamodell (SQLite)
 
 `init_db()` i `db.py` skapar schemat. Inga migrationer/Alembic - framtida
-kolumnändringar görs med `ALTER TABLE`-guards i `init_db()`.
+kolumnändringar görs med `ALTER TABLE`-guards i `init_db()`. `init_db()`
+kör dessutom en idempotent omtvätt av `author`-kolumnen (delar äldre
+flerskribent-bylines) - billig att köra varje start, skriver bara rader
+som faktiskt ändras.
 
 - `articles` - en rad per artikel. PK `id` (API:ets id som text). `bodytext`
   finns medvetet INTE (innehållspolicy, se nedan).
@@ -84,7 +87,8 @@ artikelsök, `/feed.xml` + `/feed/{section}.xml` + `/feed/t/{tag}.xml` +
 alla sektionsfeeds. HTML-vyerna har
 feed-autodiscovery (`<link rel="alternate">`) styrt av `feed_path`. Sektioner och taggar är datadrivna (`section_tag` respektive den
 tvättade `tags`-kolumnen) - hårdkoda aldrig listorna. Taggar tvättas i
-`map_article` (`_clean_tags`). `/feed/tags.xml` måste registreras före
+`map_article` (`_clean_tags`); skribenter likaså (`_clean_authors` delar
+flerskribent-bylines på komma och ` och `). `/feed/tags.xml` måste registreras före
 `/feed/{section}.xml` (annars matchas "tags" som ett section-värde).
 
 ## Vanliga ändringar

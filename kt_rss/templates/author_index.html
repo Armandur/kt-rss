@@ -21,10 +21,10 @@
 <input type="search" class="author-search"
        placeholder="Sök skribent&hellip;" autocomplete="off">
 <ul class="author-list">
-  {% for a in authors %}
-  <li data-name="{{ a.author }}">
-    <a href="/a/{{ a.author|urlencode }}">{{ a.author }}</a>
-    <span class="author-count">{{ a.count }}</span>
+  {% for name, count in authors %}
+  <li data-name="{{ name }}">
+    <a href="/a/{{ name|urlencode }}">{{ name }}</a>
+    <span class="author-count">{{ count }}</span>
   </li>
   {% endfor %}
 </ul>

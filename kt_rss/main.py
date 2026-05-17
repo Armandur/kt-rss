@@ -128,7 +128,7 @@ def _known_tags(conn) -> list[str]:
 
 
 def _known_authors(conn) -> list[str]:
-    return [row["author"] for row in list_authors(conn)]
+    return [name for name, _ in list_authors(conn)]
 
 
 def _tag_cloud(tags: list[tuple[str, int]]) -> list[tuple[str, int, int]]:
@@ -441,7 +441,7 @@ def articles_author(
     partial: int = Query(0),
 ):
     conn, settings = conn_settings
-    counts = {r["author"]: r["count"] for r in list_authors(conn)}
+    counts = dict(list_authors(conn))
     if author not in counts:
         return templates.TemplateResponse(
             request,

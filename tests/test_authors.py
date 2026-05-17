@@ -16,14 +16,28 @@ def test_get_articles_och_list_authors(db_path, raw_articles):
     upsert_article(conn, replace(base, id="a1", author="Anna Andersson"))
     upsert_article(conn, replace(base, id="a2", author="Anna Andersson"))
     upsert_article(conn, replace(base, id="b1", author="Per Persson"))
+    # Flerskribent-artikel: byline med två namn ska räknas som båda.
+    upsert_article(conn, replace(base, id="c1", author="Anna Andersson, Per Persson"))
     conn.commit()
-    # Exakt författarmatchning.
-    assert {r["id"] for r in get_articles(conn, author="Anna Andersson")} == {"a1", "a2"}
-    assert {r["id"] for r in get_articles(conn, author="Per Persson")} == {"b1"}
-    # list_authors med artikelantal.
-    authors = {r["author"]: r["count"] for r in list_authors(conn)}
-    assert authors == {"Anna Andersson": 2, "Per Persson": 1}
+    # Tokenmatchning - en flerskribent-artikel träffas av var och en.
+    assert {r["id"] for r in get_articles(conn, author="Anna Andersson")} == {"a1", "a2", "c1"}
+    assert {r["id"] for r in get_articles(conn, author="Per Persson")} == {"b1", "c1"}
+    # list_authors räknar varje enskilt namn för sig.
+    assert dict(list_authors(conn)) == {"Anna Andersson": 3, "Per Persson": 2}
     conn.close()
+
+
+def test_clean_authors_tvattar_byline(db_path, raw_articles):
+    from kt_rss.db import _clean_authors
+
+    # Inledande komma (tomt namn), inkonsekvent whitespace, dubbletter.
+    assert _clean_authors(", Patrik Hagman") == "Patrik Hagman"
+    assert _clean_authors("Anna  Andersson ,  Per Persson") == "Anna Andersson, Per Persson"
+    assert _clean_authors("Anna, Anna") == "Anna"
+    assert _clean_authors(None) == ""
+    # ' och ' räknas som avgränsare (svensk byline-konvention).
+    assert _clean_authors("Anna Andersson och Per Persson") == "Anna Andersson, Per Persson"
+    assert _clean_authors("Anna A, Per P och Karl K") == "Anna A, Per P, Karl K"
 
 
 def test_route_author(db_path, settings, raw_articles):
