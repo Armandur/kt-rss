@@ -1,7 +1,7 @@
 /* Sökrutans autocomplete: visar matchande taggar och skribenter medan man
-   skriver, hämtade från /suggest. Ett klick navigerar till tagg- eller
-   skribentvyn; Enter i rutan gör fortfarande en vanlig artikelsök.
-   Vanilla JS, inget ramverk. */
+   skriver, hämtade från /suggest. Pil upp/ner markerar ett förslag och
+   Enter väljer det; ett klick gör samma. Enter utan markering gör en
+   vanlig artikelsök. Vanilla JS, inget ramverk. */
 (function () {
   "use strict";
 
@@ -15,13 +15,33 @@
   box.style.display = "none";
   form.appendChild(box);
 
+  var active = -1; // index för markerat förslag, -1 = inget
+
+  function items() {
+    return box.querySelectorAll(".suggest-item");
+  }
+
   function hide() {
     box.style.display = "none";
     box.textContent = "";
+    active = -1;
+  }
+
+  function setActive(idx) {
+    var els = items();
+    if (!els.length) return;
+    if (idx < 0) idx = els.length - 1;
+    if (idx >= els.length) idx = 0;
+    els.forEach(function (el, i) {
+      el.classList.toggle("active", i === idx);
+    });
+    active = idx;
+    els[idx].scrollIntoView({ block: "nearest" });
   }
 
   function render(data) {
     box.textContent = "";
+    active = -1;
     var rows = [];
     (data.tags || []).forEach(function (t) {
       rows.push(["/t/" + encodeURIComponent(t), t, "tagg"]);
@@ -64,9 +84,36 @@
         .catch(hide);
     }, 180);
   });
+
   input.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") hide();
+    if (e.key === "Escape") {
+      hide();
+      return;
+    }
+    if (box.style.display === "none") return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive(active + 1);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive(active - 1);
+    } else if (e.key === "Enter") {
+      var els = items();
+      if (active >= 0 && active < els.length) {
+        e.preventDefault();
+        window.location.href = els[active].href;
+      }
+    }
   });
+
+  box.addEventListener("mouseover", function (e) {
+    var el = e.target.closest(".suggest-item");
+    if (!el) return;
+    items().forEach(function (item, i) {
+      if (item === el) setActive(i);
+    });
+  });
+
   document.addEventListener("click", function (e) {
     if (!form.contains(e.target)) hide();
   });

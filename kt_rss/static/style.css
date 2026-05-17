@@ -204,14 +204,16 @@ code {
   text-decoration: none;
   color: var(--ink);
 }
-.suggest-item:hover { background: var(--accent); color: var(--paper); }
+.suggest-item:hover,
+.suggest-item.active { background: var(--accent); color: var(--paper); }
 .suggest-kind {
   font-size: 0.7rem;
   color: var(--ink-soft);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.suggest-item:hover .suggest-kind { color: var(--paper); }
+.suggest-item:hover .suggest-kind,
+.suggest-item.active .suggest-kind { color: var(--paper); }
 
 /* Sökrutan och genvägsknappen på samma rad i hero-sektionen. */
 .hero-actions {
