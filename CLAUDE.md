@@ -42,7 +42,7 @@ kt_rss/
                   tag_index.html, author_index.html, archive_index.html,
                   status.html, search.html, notfound.html
   static/         style.css, scroll.js, feedbuilder.js, theme.js, tagcloud.js,
-                  authors.js
+                  authors.js, newsince.js
 tests/            offline mot tests/fixtures/article_response.json
 docs/SPEC.md      fullständig projektspecifikation
 ```

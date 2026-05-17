@@ -389,6 +389,18 @@ code {
 .author { color: var(--ink-soft); text-decoration: none; }
 .author:hover { color: var(--accent); text-decoration: underline; }
 
+/* "Ny"-pill - artiklar publicerade sedan förra besöket (newsince.js). */
+.new-flag {
+  background: var(--accent);
+  color: var(--paper);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+
 .article-title {
   font-family: var(--serif);
   font-size: 1.4rem;

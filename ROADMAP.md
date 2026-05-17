@@ -92,9 +92,9 @@ Prioordning enligt nedan.
 2. **Taggar som `<category>` i feed-items.** *(klar)* Feeden sätter redan
    sektionen som kategori; artikelns tvättade taggar följer nu med så
    RSS-läsare kan filtrera på dem.
-3. **Nytt sedan senaste besök.** Webui markerar artiklar som tillkommit
-   sedan förra besöket - en tidsstämpel i `localStorage`, en diskret
-   markering på nya rader.
+3. **Nytt sedan senaste besök.** *(klar)* Webui markerar artiklar som
+   tillkommit sedan förra besöket med en "Ny"-pill (`newsince.js`).
+   Jämförelsepunkten fryses per session; `localStorage` minns besöket.
 4. **Pollhistorik på statussidan.** En `poll_log`-tabell (tid, status,
    antal nya) ger en lista över de senaste rundorna och en enkel
    stapelgraf över artiklar per period.
