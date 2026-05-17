@@ -64,20 +64,21 @@ i artikellistan.
   en webui-URL klistras in.
 - **OPML-export.** `/feeds.opml` listar alla sektionsfeeds (absoluta URL:er)
   för import i en RSS-läsare i ett svep.
+- **Författarvyer.** `/a/{author}` HTML-lista och `/feed/a/{author}.xml`,
+  analogt med sektionsvyerna (exakt match på `author`). Författarnamnet i
+  varje artikel är en länk dit.
 
 ### Idéer (ej påbörjat)
 
 Prioordning enligt nedan.
 
-1. **Författarvyer.** `/a/{author}` HTML-lista och `/feed/a/{author}.xml`,
-   analogt med tagg-vyerna. `author` (`byline_names`) finns redan i `articles`.
-2. **Conditional requests på egna feeds.** Skicka `ETag`/`Last-Modified` på
+1. **Conditional requests på egna feeds.** Skicka `ETag`/`Last-Modified` på
    feed-svaren och svara `304` på `If-None-Match`/`If-Modified-Since` -
    sparar bandbredd för prenumeranterna. Skilt från Längre fram-punkten
    med samma namn, som rör kt-rss *som klient* mot KT.
-3. **Datumarkiv.** `/archive/{år}/{månad}` för att bläddra äldre artiklar
+2. **Datumarkiv.** `/archive/{år}/{månad}` för att bläddra äldre artiklar
    per period - användbart nu när arkivet är tiotusentals artiklar.
-4. **Status- och statistiksida.** En HTML-vy med pollhistorik, artikelantal
+3. **Status- och statistiksida.** En HTML-vy med pollhistorik, artikelantal
    per sektion/tagg och DB-storlek - insyn utöver `/healthz`.
 
 ## Längre fram (ej versionsbundet)

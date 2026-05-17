@@ -18,11 +18,13 @@ aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/s/{section}` | Stylead HTML-lista per sektion |
 | `/t` | Taggöversikt - taggmoln att bläddra från |
 | `/t/{tag}` | Stylead HTML-lista per tagg |
+| `/a/{author}` | Stylead HTML-lista per skribent |
 | `/tags` | Bygg en feed på flera taggar (sök + kryssrutor) |
 | `/search` | Sök artiklar på rubrik och ingress (`?q=`) |
 | `/feed.xml` | Atom, alla sektioner (`?fmt=rss` ger RSS 2.0) |
 | `/feed/{section}.xml` | Atom per sektion (`?fmt=rss` ger RSS 2.0) |
 | `/feed/t/{tag}.xml` | Atom per tagg (`?fmt=rss` ger RSS 2.0) |
+| `/feed/a/{author}.xml` | Atom per skribent (`?fmt=rss` ger RSS 2.0) |
 | `/feed/tags.xml` | Atom på flera taggar (`?t=a,b&mode=or/and`) |
 | `/feeds.opml` | OPML med alla sektionsfeeds (importeras i en RSS-läsare) |
 | `/healthz` | JSON-status: antal artiklar, senaste poll m.m. |

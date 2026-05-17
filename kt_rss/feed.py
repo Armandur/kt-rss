@@ -97,6 +97,7 @@ def build_feed(
     section: str | None = None,
     tag: str | None = None,
     tags: list[str] | None = None,
+    author: str | None = None,
     mode: str = "or",
     fmt: str = "atom",
 ) -> bytes:
@@ -108,6 +109,9 @@ def build_feed(
         feed_url = f"{settings.public_url}/feed/tags.xml?t={joined}&mode={mode}"
         sep = " och " if mode == "and" else " eller "
         title = f"Kyrkans Tidning - taggar: {sep.join(tags)}"
+    elif author:
+        feed_url = f"{settings.public_url}/feed/a/{quote(author)}.xml"
+        title = f"Kyrkans Tidning - {author}"
     elif tag:
         feed_url = f"{settings.public_url}/feed/t/{quote(tag)}.xml"
         title = f"Kyrkans Tidning - tagg: {tag}"

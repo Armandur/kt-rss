@@ -20,7 +20,7 @@
   <div class="article-body">
     <div class="article-meta">
       {% if a.kicker %}<span class="kicker">{{ a.kicker }}</span>{% endif %}
-      {% if a.author %}<span class="author">{{ a.author }}</span>{% endif %}
+      {% if a.author %}<a class="author" href="/a/{{ a.author|urlencode }}">{{ a.author }}</a>{% endif %}
     </div>
     <h2 class="article-title">
       <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.title }}</a>

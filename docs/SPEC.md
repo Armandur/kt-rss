@@ -338,6 +338,7 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 | GET   | `/feed.xml`           | Atom, alla sektioner, senaste `MAX_ITEMS`         |
 | GET   | `/feed/{section}.xml` | Atom filtrerad på `section_tag`                   |
 | GET   | `/feed/t/{tag}.xml`   | Atom filtrerad på en tvättad tagg                 |
+| GET   | `/feed/a/{author}.xml`| Atom filtrerad på skribent                        |
 | GET   | `/feed/tags.xml`      | Atom på flera taggar (`?t=a,b&mode=or/and`)       |
 | GET   | `/feeds.opml`         | OPML med alla sektionsfeeds                       |
 | GET   | `/healthz`            | JSON: status, antal, senaste lyckad poll          |
@@ -346,6 +347,7 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 | GET   | `/s/{section}`        | HTML-lista filtrerad på `section_tag`             |
 | GET   | `/t`                  | HTML: taggöversikt (taggmoln)                     |
 | GET   | `/t/{tag}`            | HTML-lista filtrerad på en tvättad tagg           |
+| GET   | `/a/{author}`         | HTML-lista filtrerad på skribent                  |
 | GET   | `/tags`               | HTML: bygg en feed på flera taggar                |
 | GET   | `/search`             | HTML: FTS5-sök på titel/ingress/taggar (`?q=`)    |
 

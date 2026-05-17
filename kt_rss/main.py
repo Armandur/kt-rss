@@ -32,6 +32,7 @@ from kt_rss.db import (
     get_articles_for_tags,
     get_fetch_state,
     init_db,
+    list_authors,
     list_sections,
     list_tags,
     search_articles,
@@ -124,6 +125,10 @@ def _known_sections(conn) -> list[str]:
 
 def _known_tags(conn) -> list[str]:
     return [tag for tag, _ in list_tags(conn)]
+
+
+def _known_authors(conn) -> list[str]:
+    return [row["author"] for row in list_authors(conn)]
 
 
 def _tag_cloud(tags: list[tuple[str, int]]) -> list[tuple[str, int, int]]:
@@ -254,6 +259,23 @@ def feed_tag(
         )
     articles = get_articles(conn, tag=tag_l, limit=settings.max_items)
     return _feed_response(build_feed(settings, articles, tag=tag_l, fmt=fmt), fmt)
+
+
+@app.get("/feed/a/{author}.xml")
+def feed_author(
+    author: str,
+    conn_settings=Depends(get_conn_settings),
+    fmt: str = Query("atom", pattern="^(atom|rss)$"),
+) -> Response:
+    conn, settings = conn_settings
+    if author not in _known_authors(conn):
+        return JSONResponse(
+            status_code=404, content={"error": f"okänd skribent: {author}"}
+        )
+    articles = get_articles(conn, author=author, limit=settings.max_items)
+    return _feed_response(
+        build_feed(settings, articles, author=author, fmt=fmt), fmt
+    )
 
 
 @app.get("/feeds.opml")
@@ -394,6 +416,48 @@ def articles_tag(
             "section": None,
             "tag": tag_l,
             "feed_path": f"/feed/t/{quote(tag_l)}.xml",
+            "state": get_fetch_state(conn),
+            "pagination": pg,
+        },
+    )
+
+
+@app.get("/a/{author}", response_class=HTMLResponse)
+def articles_author(
+    author: str,
+    request: Request,
+    conn_settings=Depends(get_conn_settings),
+    page: int = Query(1, ge=1),
+    partial: int = Query(0),
+):
+    conn, settings = conn_settings
+    counts = {r["author"]: r["count"] for r in list_authors(conn)}
+    if author not in counts:
+        return templates.TemplateResponse(
+            request,
+            "notfound.html",
+            {"kind": "skribent", "name": author,
+             "sections": _known_sections(conn)},
+            status_code=404,
+        )
+    pg = _paginate(
+        f"/a/{quote(author)}", page, counts[author], settings.page_size
+    )
+    articles = get_articles(
+        conn, author=author, limit=settings.page_size, offset=pg["offset"]
+    )
+    if partial:
+        return templates.TemplateResponse(
+            request, "_articles.html", {"articles": articles}
+        )
+    return templates.TemplateResponse(
+        request,
+        "list.html",
+        {
+            "articles": articles,
+            "title": author,
+            "section": None,
+            "feed_path": f"/feed/a/{quote(author)}.xml",
             "state": get_fetch_state(conn),
             "pagination": pg,
         },

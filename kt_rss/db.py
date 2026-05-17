@@ -306,14 +306,16 @@ def get_articles(
     *,
     section: str | None = None,
     tag: str | None = None,
+    author: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> list[sqlite3.Row]:
     """Artiklar sorterade på published_at fallande.
 
-    Filtrerar på `section` eller `tag` om angivet. `tag` matchas mot en hel
-    token i den ', '-joinade tags-kolumnen - inte som delsträng, så 'kyrka'
-    träffar inte 'svenska kyrkan'. `offset` hoppar förbi rader (paginering).
+    Filtrerar på `section`, `tag` eller `author` om angivet. `tag` matchas
+    mot en hel token i den ', '-joinade tags-kolumnen - inte som delsträng,
+    så 'kyrka' träffar inte 'svenska kyrkan'. `author` matchas exakt.
+    `offset` hoppar förbi rader (paginering).
     """
     if tag is not None:
         return conn.execute(
@@ -321,6 +323,12 @@ def get_articles(
             "WHERE instr(', ' || tags || ', ', ', ' || ? || ', ') > 0 "
             "ORDER BY published_at DESC LIMIT ? OFFSET ?",
             (tag, limit, offset),
+        ).fetchall()
+    if author is not None:
+        return conn.execute(
+            "SELECT * FROM articles WHERE author = ? "
+            "ORDER BY published_at DESC LIMIT ? OFFSET ?",
+            (author, limit, offset),
         ).fetchall()
     if section is None:
         return conn.execute(
@@ -396,6 +404,14 @@ def list_sections(conn: sqlite3.Connection) -> list[sqlite3.Row]:
     return conn.execute(
         "SELECT section, COUNT(*) AS count FROM articles "
         "WHERE section <> '' GROUP BY section ORDER BY section"
+    ).fetchall()
+
+
+def list_authors(conn: sqlite3.Connection) -> list[sqlite3.Row]:
+    """Alla författare med artikelantal - datadrivet ur author-kolumnen."""
+    return conn.execute(
+        "SELECT author, COUNT(*) AS count FROM articles "
+        "WHERE author <> '' GROUP BY author ORDER BY author"
     ).fetchall()
 
 

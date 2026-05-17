@@ -355,7 +355,8 @@ code {
   font-weight: 700;
   color: var(--accent);
 }
-.author { color: var(--ink-soft); }
+.author { color: var(--ink-soft); text-decoration: none; }
+.author:hover { color: var(--accent); text-decoration: underline; }
 
 .article-title {
   font-family: var(--serif);
