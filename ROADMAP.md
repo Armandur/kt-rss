@@ -100,6 +100,10 @@ Prioordning enligt nedan.
    stapelgraf över artiklar per period.
 5. **Sökförslag.** Taggar och skribenter som autocomplete medan man
    skriver i sökrutan.
+6. **Liveuppdatering av öppen sida.** En öppen flik visar nya artiklar
+   utan omladdning - frågar periodiskt en endpoint om det finns nyare och
+   infogar dem överst (med "Ny"-pill). Lättare än webbläsarnotiser, ingen
+   service worker.
 
 ## Längre fram (ej versionsbundet)
 
