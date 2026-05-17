@@ -111,6 +111,14 @@ i artikellistan.
   till föregående och nästa månad (de som har artiklar), placerade både
   högst upp och längst ned på sidan.
 
+## v5.1.2 (planerad)
+
+- **"Upp"-knapp.** En flytande knapp som dyker upp efter en bit scroll
+  och tar tillbaka till sidans topp. Visas på alla skärmstorlekar.
+- **Fäst liveuppdaterings-bannern.** Bannern för nya artiklar placeras
+  `position: fixed` i toppen i stället för i flödet, så den syns även när
+  man scrollat ner i listan.
+
 ## Längre fram (ej versionsbundet)
 
 - **Webbläsarnotiser.** Notis när nya artiklar dykt upp (eller annat
