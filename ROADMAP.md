@@ -145,6 +145,10 @@ i artikellistan.
   varje start (~0,4 s per 10 000 artiklar, linjärt). Vid stora arkiv blir
   det en märkbar appstart-fördröjning - bygg om bara när indexet saknas
   eller har drivit i stället.
+- **Databasbackup.** Arkivet är tiotusentals artiklar i en SQLite-fil och
+  en backfill mot KT är långsam (hövlighetsgränsen). Ett periodiskt
+  `VACUUM INTO`-jobb, eller backup av Docker-volymen på värdsidan, vore
+  billig försäkring mot att filen tappas eller korrumperas.
 
 ## Utanför scope
 
