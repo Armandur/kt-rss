@@ -2,7 +2,7 @@
 
 from fastapi.testclient import TestClient
 
-from kt_rss.db import connect, map_article, upsert_article
+from kt_rss.db import connect, log_poll, map_article, recent_polls, upsert_article
 from kt_rss.main import _human_size, app, get_conn_settings
 
 BASE = "https://www.kyrkanstidning.se"
@@ -12,6 +12,18 @@ def test_human_size():
     assert _human_size(512) == "512 B"
     assert _human_size(2048) == "2 KB"
     assert _human_size(5 * 1024 * 1024) == "5.0 MB"
+
+
+def test_poll_log(db_path):
+    conn = connect(db_path)
+    log_poll(conn, status="ok", fetched=50, inserted=3, updated=1)
+    log_poll(conn, status="skipped_304")
+    rows = recent_polls(conn)
+    # Nyaste rundan först.
+    assert rows[0]["status"] == "skipped_304"
+    assert rows[1]["status"] == "ok"
+    assert rows[1]["fetched"] == 50 and rows[1]["inserted"] == 3
+    conn.close()
 
 
 def test_status_page(db_path, settings, raw_articles):
@@ -36,5 +48,7 @@ def test_status_page(db_path, settings, raw_articles):
         assert "Artiklar i arkivet" in r.text
         assert "Databasstorlek" in r.text
         assert "Vanligaste taggar" in r.text
+        assert "Pollhistorik" in r.text
+        assert "Artiklar per månad" in r.text
     finally:
         app.dependency_overrides.clear()

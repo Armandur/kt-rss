@@ -21,6 +21,29 @@
 </section>
 
 <section class="status-block">
+  <h2>Pollhistorik</h2>
+  {% if polls %}
+  <table class="poll-log">
+    <thead>
+      <tr><th>Tidpunkt</th><th>Resultat</th><th>Hämtade</th><th>Nya</th></tr>
+    </thead>
+    <tbody>
+      {% for p in polls %}
+      <tr>
+        <td>{{ p.run_at }}</td>
+        <td>{{ p.status }}</td>
+        <td>{{ p.fetched }}</td>
+        <td>{{ p.inserted }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">Ingen pollhistorik än.</p>
+  {% endif %}
+</section>
+
+<section class="status-block">
   <h2>Innehåll</h2>
   <dl class="status-grid">
     <dt>Artiklar i arkivet</dt><dd>{{ article_count }}</dd>
@@ -37,6 +60,24 @@
     <dd>{{ editorial_count }} redaktionella, {{ debate_count }} debatt/övriga</dd>
     <dt>Databasstorlek</dt><dd>{{ db_size }}</dd>
   </dl>
+</section>
+
+<section class="status-block">
+  <h2>Artiklar per månad</h2>
+  {% if chart %}
+  <div class="bar-chart">
+    {% for m in chart %}
+    <div class="bar-col" title="{{ m.count }} artiklar">
+      <div class="bar-track">
+        <div class="bar" style="height: {{ m.pct }}%"></div>
+      </div>
+      <span class="bar-label">{{ m.label }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty">Ingen data än.</p>
+  {% endif %}
 </section>
 
 <section class="status-block">

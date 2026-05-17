@@ -175,6 +175,15 @@ def init_db(db_path: str) -> None:
             );
 
             INSERT OR IGNORE INTO fetch_state (key) VALUES ('default');
+
+            CREATE TABLE IF NOT EXISTS poll_log (
+                id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_at    TEXT NOT NULL,
+                status    TEXT NOT NULL,
+                fetched   INTEGER NOT NULL DEFAULT 0,
+                inserted  INTEGER NOT NULL DEFAULT 0,
+                updated   INTEGER NOT NULL DEFAULT 0
+            );
             """
         )
         # ALTER TABLE-guards: kolumner som tillkom efter v1 (ROADMAP v2).
@@ -335,6 +344,32 @@ def touch_run(conn: sqlite3.Connection, last_status: str) -> None:
         (now_utc(), last_status),
     )
     conn.commit()
+
+
+def log_poll(
+    conn: sqlite3.Connection,
+    *,
+    status: str,
+    fetched: int = 0,
+    inserted: int = 0,
+    updated: int = 0,
+) -> None:
+    """Skriver en rad i poll_log för en avslutad pollrunda (statussidan)."""
+    conn.execute(
+        "INSERT INTO poll_log (run_at, status, fetched, inserted, updated) "
+        "VALUES (?, ?, ?, ?, ?)",
+        (now_utc(), status, fetched, inserted, updated),
+    )
+    conn.commit()
+
+
+def recent_polls(
+    conn: sqlite3.Connection, limit: int = 15
+) -> list[sqlite3.Row]:
+    """Senaste pollrundorna ur poll_log, nyaste först."""
+    return conn.execute(
+        "SELECT * FROM poll_log ORDER BY id DESC LIMIT ?", (limit,)
+    ).fetchall()
 
 
 def get_articles(

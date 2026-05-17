@@ -95,9 +95,9 @@ Prioordning enligt nedan.
 3. **Nytt sedan senaste besök.** *(klar)* Webui markerar artiklar som
    tillkommit sedan förra besöket med en "Ny"-pill (`newsince.js`).
    Jämförelsepunkten fryses per session; `localStorage` minns besöket.
-4. **Pollhistorik på statussidan.** En `poll_log`-tabell (tid, status,
-   antal nya) ger en lista över de senaste rundorna och en enkel
-   stapelgraf över artiklar per period.
+4. **Pollhistorik på statussidan.** *(klar)* En `poll_log`-tabell (tid,
+   status, hämtade/nya/uppdaterade) ger en lista över de senaste rundorna,
+   och en stapelgraf visar artiklar per månad de senaste året.
 5. **Sökförslag.** Taggar och skribenter som autocomplete medan man
    skriver i sökrutan.
 6. **Liveuppdatering av öppen sida.** En öppen flik visar nya artiklar

@@ -59,6 +59,8 @@ som faktiskt ändras.
   finns medvetet INTE (innehållspolicy, se nedan).
 - `fetch_state` - en rad (`key='default'`): pollningstillstånd, `last_status`,
   `total_count` m.m.
+- `poll_log` - en rad per pollrunda (tid, status, antal hämtade/nya/
+  uppdaterade). `poll_once` skriver, `/status` visar pollhistoriken.
 - `articles_fts` - FTS5-fulltextindex (external content mot `articles`,
   triggersynkat) för `/search`. `init_db()` kör `'rebuild'` vid start.
 

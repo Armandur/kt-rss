@@ -39,6 +39,7 @@ from kt_rss.db import (
     list_authors_split,
     list_sections,
     list_tags,
+    recent_polls,
     search_articles,
 )
 from kt_rss.db import (
@@ -680,6 +681,29 @@ def status_page(request: Request, conn_settings=Depends(get_conn_settings)):
     def _period(row) -> str:
         return f"{SV_MONTHS[int(row['month'])]} {row['year']}"
 
+    polls = [
+        {
+            "run_at": _sv_datetime(r["run_at"]),
+            "status": STATUS_LABELS.get(r["status"], r["status"]),
+            "fetched": r["fetched"],
+            "inserted": r["inserted"],
+            "updated": r["updated"],
+        }
+        for r in recent_polls(conn)
+    ]
+    # Stapelgraf: senaste tolv månaderna i kronologisk ordning, höjd i
+    # procent av den mest artikelrika månaden.
+    chart_months = list(months[:12])[::-1]
+    max_count = max((r["count"] for r in chart_months), default=1)
+    chart = [
+        {
+            "label": f"{SV_MONTHS[int(r['month'])][:3]} {r['year'][2:]}",
+            "count": r["count"],
+            "pct": round(r["count"] / max_count * 100),
+        }
+        for r in chart_months
+    ]
+
     return templates.TemplateResponse(
         request,
         "status.html",
@@ -700,6 +724,8 @@ def status_page(request: Request, conn_settings=Depends(get_conn_settings)):
             "newest_period": _period(months[0]) if months else None,
             "oldest_period": _period(months[-1]) if months else None,
             "db_size": _human_size(db_bytes),
+            "polls": polls,
+            "chart": chart,
         },
     )
 

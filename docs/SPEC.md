@@ -264,6 +264,10 @@ pytest. **Ingen HTML-parser.** Minimala dependencies.
 `key` PK, `etag`, `last_modified`, `last_run_at`, `last_count`,
 `last_status` (`ok`/`skipped_304`/`error`/`sanity_failed`), `total_count`.
 
+### Tabell `poll_log`
+En rad per pollrunda: `id` PK, `run_at`, `status`, `fetched`, `inserted`,
+`updated`. Skrivs av `poll_once`, visas som pollhistorik på `/status`.
+
 ### FTS5-index `articles_fts`
 Virtuell FTS5-tabell (external content mot `articles`) som indexerar
 `title`, `subtitle`, `tags`, `author` för `/search`. Triggrar på `articles`

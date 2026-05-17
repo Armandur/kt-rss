@@ -18,6 +18,7 @@ from kt_rss.db import (
     STATUS_SKIPPED_304,
     connect,
     get_fetch_state,
+    log_poll,
     map_article,
     save_fetch_state,
     touch_run,
@@ -38,7 +39,7 @@ def poll_once(settings: Settings) -> dict:
     här, stacktrace loggas, och nästa schemalagda körning fortsätter.
     """
     try:
-        return _do_poll(settings)
+        summary = _do_poll(settings)
     except Exception:
         logger.exception(
             "oväntat fel i pollningsrunda - schemaläggaren påverkas inte"
@@ -51,7 +52,26 @@ def poll_once(settings: Settings) -> dict:
                 conn.close()
         except Exception:
             logger.exception("kunde inte skriva error-status till fetch_state")
-        return {"status": STATUS_ERROR}
+        summary = {"status": STATUS_ERROR}
+
+    # Pollhistorik för statussidan. Egen connection och egen try - en miss
+    # i loggningen får inte påverka pollresultatet.
+    try:
+        conn = connect(settings.db_path)
+        try:
+            log_poll(
+                conn,
+                status=summary.get("status", STATUS_ERROR),
+                fetched=summary.get("fetched", 0),
+                inserted=summary.get("inserted", 0),
+                updated=summary.get("updated", 0),
+            )
+        finally:
+            conn.close()
+    except Exception:
+        logger.exception("kunde inte skriva poll_log")
+
+    return summary
 
 
 def _do_poll(settings: Settings) -> dict:
