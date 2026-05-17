@@ -33,7 +33,10 @@
       return;
     }
     loading = true;
-    var url = sentinel.dataset.base + "?page=" + next + "&partial=1";
+    // base kan redan ha en query-sträng (t.ex. /search?q=...).
+    var base = sentinel.dataset.base;
+    var sep = base.indexOf("?") === -1 ? "?" : "&";
+    var url = base + sep + "page=" + next + "&partial=1";
     fetch(url)
       .then(function (resp) {
         if (!resp.ok) throw new Error("HTTP " + resp.status);

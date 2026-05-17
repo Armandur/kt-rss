@@ -460,13 +460,14 @@ def _fts_query(raw: str) -> str | None:
 
 
 def search_articles(
-    conn: sqlite3.Connection, query: str, *, limit: int = 50
+    conn: sqlite3.Connection, query: str, *, limit: int = 50, offset: int = 0
 ) -> list[sqlite3.Row]:
     """Fulltextsök på titel, ingress, taggar och författare (FTS5).
 
     Orden bildar en AND-sökning av literala termer; FTS5:s unicode61-
     tokenizer ger korrekt versal- och åäö-hantering. Resultaten rankas på
-    relevans (bm25, lägre = mer relevant). Tom/ogiltig sökterm ger tom lista.
+    relevans (bm25, lägre = mer relevant). `offset` hoppar förbi rader för
+    paginering. Tom/ogiltig sökterm ger tom lista.
     """
     match = _fts_query(query)
     if match is None:
@@ -475,9 +476,20 @@ def search_articles(
         "SELECT a.* FROM articles a "
         "JOIN articles_fts ON articles_fts.rowid = a.rowid "
         "WHERE articles_fts MATCH ? "
-        "ORDER BY bm25(articles_fts), a.published_at DESC LIMIT ?",
-        (match, limit),
+        "ORDER BY bm25(articles_fts), a.published_at DESC LIMIT ? OFFSET ?",
+        (match, limit, offset),
     ).fetchall()
+
+
+def count_search_results(conn: sqlite3.Connection, query: str) -> int:
+    """Antal artiklar som matchar söktermen (FTS5) - för paginering."""
+    match = _fts_query(query)
+    if match is None:
+        return 0
+    return conn.execute(
+        "SELECT COUNT(*) AS c FROM articles_fts WHERE articles_fts MATCH ?",
+        (match,),
+    ).fetchone()["c"]
 
 
 def list_sections(conn: sqlite3.Connection) -> list[sqlite3.Row]:

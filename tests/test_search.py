@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 from kt_rss.db import (
     _fts_query,
     connect,
+    count_search_results,
     map_article,
     search_articles,
     upsert_article,
@@ -113,6 +114,36 @@ def test_route_search_feed(db_path, settings, raw_articles):
         assert client.get("/feed/search.xml").status_code == 400
         # /search-sidan pekar ut sök-feeden (autodiscovery + badge).
         assert "/feed/search.xml?q=unik" in client.get("/search?q=unik").text
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_search_pagination(db_path, settings, raw_articles):
+    base = map_article(raw_articles[0], BASE)
+    conn = connect(db_path)
+    upsert_article(conn, replace(base, id="x1", title="Klimat ett"))
+    upsert_article(conn, replace(base, id="x2", title="Klimat två"))
+    conn.commit()
+    # count_search_results räknar alla träffar, oberoende av sidstorlek.
+    assert count_search_results(conn, "klimat") == 2
+    # offset hoppar förbi träffar.
+    assert len(search_articles(conn, "klimat", limit=1, offset=1)) == 1
+    conn.close()
+
+    def _override():
+        c = connect(db_path)
+        try:
+            yield c, settings
+        finally:
+            c.close()
+
+    app.dependency_overrides[get_conn_settings] = _override
+    try:
+        client = TestClient(app)
+        # partial=1 ger ett artikelfragment utan sidram.
+        frag = client.get("/search?q=klimat&partial=1")
+        assert frag.status_code == 200
+        assert "<article" in frag.text and "<h1>" not in frag.text
     finally:
         app.dependency_overrides.clear()
 

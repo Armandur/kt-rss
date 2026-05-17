@@ -121,10 +121,9 @@ i artikellistan.
 
 ## v5.1.3 (planerad)
 
-- **Infinite scroll på sökresultat.** `/search` visar i dag bara de
-  första träffarna och stannar där. `search_articles` får en
-  offset-parameter och `/search`-routen paginering, som de övriga
-  listvyerna.
+- **Infinite scroll på sökresultat.** *(klar)* `/search` paginerar nu som
+  de övriga listvyerna - `search_articles` fick en offset-parameter och
+  `count_search_results` räknar träffarna. Träfftexten visar totalen.
 - **Tangentbordsnavigering i sökförslagen.** Pil upp/ner markerar ett
   förslag i autocomplete-dropdownen, Enter väljer det - i dag krävs
   musklick.

@@ -21,7 +21,7 @@
 
 {% if q %}
 <p class="lead">
-  {{ articles|length }} träff{{ '' if articles|length == 1 else 'ar' }}
+  {{ total }} träff{{ '' if total == 1 else 'ar' }}
   för &rdquo;{{ q }}&rdquo;.
 </p>
 {% endif %}
@@ -30,7 +30,19 @@
 <div class="articles">
   {% include "_articles.html" %}
 </div>
+{% if pagination and pagination.next_page %}
+<div class="scroll-sentinel"
+     data-base="{{ pagination.base }}"
+     data-next-page="{{ pagination.next_page }}"
+     data-total-pages="{{ pagination.total_pages }}"></div>
+{% endif %}
 {% elif q %}
 <p class="empty">Inga artiklar matchade sökningen.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if pagination and pagination.next_page %}
+<script src="/static/scroll.js" defer></script>
 {% endif %}
 {% endblock %}

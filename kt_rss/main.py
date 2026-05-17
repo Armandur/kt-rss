@@ -31,6 +31,7 @@ from kt_rss.db import (
     connect,
     count_articles,
     count_articles_after,
+    count_search_results,
     get_articles,
     get_articles_for_tags,
     get_fetch_state,
@@ -644,20 +645,34 @@ def search(
     request: Request,
     conn_settings=Depends(get_conn_settings),
     q: str = Query(""),
+    page: int = Query(1, ge=1),
+    partial: int = Query(0),
 ):
     conn, settings = conn_settings
-    results = search_articles(conn, q, limit=settings.page_size)
     q_clean = q.strip()
+    total = count_search_results(conn, q) if q_clean else 0
+    pg = _paginate(
+        f"/search?q={quote(q_clean)}", page, total, settings.page_size
+    )
+    results = search_articles(
+        conn, q, limit=settings.page_size, offset=pg["offset"]
+    )
+    if partial:
+        return templates.TemplateResponse(
+            request, "_articles.html", {"articles": results}
+        )
     return templates.TemplateResponse(
         request,
         "search.html",
         {
             "q": q,
             "articles": results,
+            "total": total,
             "state": get_fetch_state(conn),
             "feed_path": (
                 f"/feed/search.xml?q={quote(q_clean)}" if q_clean else None
             ),
+            "pagination": pg,
         },
     )
 
