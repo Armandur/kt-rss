@@ -55,10 +55,6 @@ i artikellistan.
   variablerna i `:root` gör det enkelt - en mörk palett under
   `@media (prefers-color-scheme: dark)` plus en `[data-theme]`-override
   för manuellt val.
-- **Textutdrag i feed-summary.** Om det någonsin görs: använd `subtitle`
-  som primär summary. `bodytext` är osäkert fullständig och varierar per
-  artikeltyp (poddar har programtext, inte transkription - spec §2.1) -
-  lita aldrig på den. Brödtext återpubliceras inte (innehållspolicy §7).
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
 - **Webbläsarnotiser.** Notis när nya artiklar dykt upp (eller annat
