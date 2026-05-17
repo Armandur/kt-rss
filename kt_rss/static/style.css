@@ -13,6 +13,31 @@
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* Mörk palett. Följer OS via prefers-color-scheme, om inte ett manuellt
+   ljust val gjorts. [data-theme] sätts av theme.js (manuell växling).
+   Accenten ljusas upp för läsbar kontrast mot mörk bakgrund. */
+:root[data-theme="dark"] {
+  --paper: #1b1815;
+  --card: #252019;
+  --ink: #ece4d6;
+  --ink-soft: #a89e8d;
+  --accent: #d56e7b;
+  --accent-soft: #e4939d;
+  --line: #3a332b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1b1815;
+    --card: #252019;
+    --ink: #ece4d6;
+    --ink-soft: #a89e8d;
+    --accent: #d56e7b;
+    --accent-soft: #e4939d;
+    --line: #3a332b;
+  }
+}
+
 * { box-sizing: border-box; }
 
 html, body { margin: 0; }
@@ -62,6 +87,21 @@ code {
   color: var(--ink-soft);
 }
 .poll-status strong { text-transform: capitalize; }
+
+.theme-toggle {
+  font: inherit;
+  font-size: 0.84rem;
+  cursor: pointer;
+  padding: 0.3rem 0.7rem;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.theme-toggle:hover {
+  border-color: var(--accent-soft);
+  color: var(--accent);
+}
 
 .brand {
   display: flex;
@@ -185,7 +225,7 @@ code {
 
 .card-meta { color: var(--ink-soft); font-size: 0.9rem; }
 
-.card--all { grid-column: 1 / -1; background: #fbf3ef; }
+.card--all { grid-column: 1 / -1; background: var(--card); }
 .card--all .card-title { font-size: 1.6rem; }
 
 /* Hopfällbara sektionskort. Summaryn syns på mobil (toggle) och som

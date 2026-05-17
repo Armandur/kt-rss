@@ -41,7 +41,16 @@ i artikellistan.
 - **Artikelsök.** `/search?q=` söker artiklar på titel och ingress
   (`instr`-substräng, versal-okänsligt). Sökruta i startsidans hero.
 
-## v4 - idéer (ej påbörjat)
+## v4
+
+### Klart
+
+- **Mörkt/ljust tema.** Mörk palett som följer OS via `prefers-color-scheme`,
+  med en manuell växlingsknapp i headern. Valet sparas i localStorage och
+  appliceras FOUC-fritt av ett inline-script i `<head>`; `theme.js` sköter
+  knappen, `[data-theme]` på `<html>` styr override.
+
+### Idéer (ej påbörjat)
 
 - **Bättre sök.** `/search` är i dag en enkel `instr`-substräng på titel
   och ingress, utan ranking eller paginering. Uppslag: SQLite FTS5 för
@@ -50,11 +59,6 @@ i artikellistan.
 - **Bläddra via taggar.** En översiktsvy som listar alla taggar (taggmoln
   eller sökbar lista) att klicka sig in i `/t/{tag}` från. I dag når man
   taggvyerna bara via pills på artiklar eller `/tags`-feedbyggaren.
-- **Mörkt/ljust tema.** Mörkt läge utöver det nuvarande ljusa. Följ OS:et
-  via `prefers-color-scheme`, med möjlighet att växla manuellt. CSS-
-  variablerna i `:root` gör det enkelt - en mörk palett under
-  `@media (prefers-color-scheme: dark)` plus en `[data-theme]`-override
-  för manuellt val.
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
 - **Webbläsarnotiser.** Notis när nya artiklar dykt upp (eller annat

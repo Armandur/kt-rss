@@ -32,7 +32,7 @@ kt_rss/
   backfill.py     manuell CLI-backfill + uppstarts-backfill (spec §8.1)
   main.py         FastAPI-app: feeds, HTML-vyer, /healthz, lifespan
   templates/      base.html, index.html, list.html, _articles.html, tags.html, notfound.html
-  static/         style.css, scroll.js (infinite scroll), feedbuilder.js (/tags)
+  static/         style.css, scroll.js, feedbuilder.js (/tags), theme.js (mörkt/ljust)
 tests/            offline mot tests/fixtures/article_response.json
 docs/SPEC.md      fullständig projektspecifikation
 ```

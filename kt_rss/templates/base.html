@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}KT-RSS{% endblock %}</title>
   <link rel="icon" href="data:,">
+  <script>
+    /* Applicera sparat tema före render - undviker ljus/mörk-flimmer. */
+    (function () {
+      var t = localStorage.getItem("theme");
+      if (t === "dark" || t === "light")
+        document.documentElement.dataset.theme = t;
+    })();
+  </script>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -23,6 +31,8 @@
         &middot; {{ state.last_run_at|sv_datetime }}
       </p>
       {% endif %}
+      <button class="theme-toggle" type="button"
+              aria-label="Växla mörkt/ljust tema">Tema</button>
     </div>
   </header>
 
@@ -30,5 +40,6 @@
     {% block content %}{% endblock %}
   </main>
   {% block scripts %}{% endblock %}
+  <script src="/static/theme.js" defer></script>
 </body>
 </html>
