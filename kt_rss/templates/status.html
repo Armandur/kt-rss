@@ -11,6 +11,14 @@
 </header>
 
 <section class="status-block">
+  <h2>Version</h2>
+  <dl class="status-grid">
+    <dt>kt-rss</dt><dd>{{ version }}</dd>
+    <dt>Branch</dt><dd>{{ branch or "-" }}</dd>
+  </dl>
+</section>
+
+<section class="status-block">
   <h2>Pollning</h2>
   <dl class="status-grid">
     <dt>Senaste poll</dt><dd>{{ last_poll or "-" }}</dd>

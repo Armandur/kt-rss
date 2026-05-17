@@ -25,6 +25,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from kt_rss import __version__
 from kt_rss.backfill import maybe_start_backfill
 from kt_rss.config import DEBATE_SECTIONS, Settings, get_settings
 from kt_rss.db import (
@@ -98,6 +99,24 @@ def _human_size(num: int) -> str:
             return f"{size:.0f} {unit}"
         size /= 1024
     return f"{size:.1f} MB"
+
+
+def _git_branch() -> str | None:
+    """Aktuell git-branch ur .git/HEAD.
+
+    Returnerar None när .git saknas - t.ex. i en byggd Docker-image, där
+    koden inte kommer från ett utcheckat repo. Detached HEAD ger en kort
+    commit-hash. Ren filläsning, ingen subprocess.
+    """
+    head = _BASE_DIR.parent / ".git" / "HEAD"
+    try:
+        content = head.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    prefix = "ref: refs/heads/"
+    if content.startswith(prefix):
+        return content[len(prefix):]
+    return content[:8] or None
 
 
 templates.env.filters["sv_date"] = _sv_date
@@ -780,6 +799,8 @@ def status_page(request: Request, conn_settings=Depends(get_conn_settings)):
             "db_size": _human_size(db_bytes),
             "polls": polls,
             "chart": chart,
+            "version": __version__,
+            "branch": _git_branch(),
         },
     )
 
