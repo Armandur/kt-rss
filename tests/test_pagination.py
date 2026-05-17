@@ -66,6 +66,8 @@ def test_route_partial_ger_fragment(db_path, settings, raw_articles):
         client = TestClient(app)
         full = client.get("/articles")
         assert full.status_code == 200 and "<html" in full.text
+        # Feed-autodiscovery: RSS-läsare hittar feeden via <link rel=alternate>.
+        assert 'rel="alternate"' in full.text and "/feed.xml" in full.text
         frag = client.get("/articles?page=1&partial=1")
         assert frag.status_code == 200
         # Fragmentet är bara artikelrader - ingen sidram.

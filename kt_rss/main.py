@@ -274,6 +274,7 @@ def index(request: Request, conn_settings=Depends(get_conn_settings)):
             "articles": get_articles(conn, limit=settings.page_size),
             # Sentineln pekar på /articles - startsidans lista är dess sida 1.
             "pagination": _paginate("/articles", 1, total, settings.page_size),
+            "feed_path": "/feed.xml",
         },
     )
 

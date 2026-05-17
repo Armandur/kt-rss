@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}KT-RSS{% endblock %}</title>
   <link rel="icon" href="data:,">
+  {% if feed_path %}
+  <link rel="alternate" type="application/atom+xml"
+        title="KT-RSS{% if title %} - {{ title }}{% endif %}"
+        href="{{ feed_path }}">
+  {% endif %}
   <script>
     /* Applicera sparat tema före render - undviker ljus/mörk-flimmer. */
     (function () {
