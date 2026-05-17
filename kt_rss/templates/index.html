@@ -10,19 +10,21 @@
     bläddra bland <a href="/t">taggar</a>, <a href="/a">skribenter</a>
     eller <a href="/archive">arkivet</a>.
   </p>
-  <form class="searchbox" action="/search" method="get" role="search">
-    <input type="search" name="q" placeholder="Sök i rubrik och ingress&hellip;"
-           autocomplete="off">
-    <button type="submit">Sök</button>
-  </form>
-  {% if articles %}
-  <a class="jump-latest" href="#senaste">
-    Senaste artiklarna <span class="arrow" aria-hidden="true">&darr;</span>
-  </a>
-  {% endif %}
+  <div class="hero-actions">
+    <form class="searchbox" action="/search" method="get" role="search">
+      <input type="search" name="q" placeholder="Sök i rubrik och ingress&hellip;"
+             autocomplete="off">
+      <button type="submit">Sök</button>
+    </form>
+    {% if articles %}
+    <a class="jump-latest" href="#senaste">
+      Senaste artiklarna <span class="arrow" aria-hidden="true">&darr;</span>
+    </a>
+    {% endif %}
+  </div>
 </section>
 
-<details class="sections-toggle">
+<details class="sections-toggle" open>
   <summary>Sektioner</summary>
   <div class="cards">
     {% for row in sections %}
@@ -52,16 +54,38 @@
   </div>
 </details>
 {#
-  Sektionerna börjar ihopfällda (mobil ser "Senaste artiklarna" direkt).
-  På desktop fälls de ut och summaryn döljs. Utan JS går de att fälla
-  ut manuellt - summaryn är då kvar och klickbar.
+  Sektionerna renderas utfällda (open) så att desktop har en stabil layout
+  redan vid parse. Annars hann en /#senaste-navigering i en ny flik ske
+  innan JS fällt ut korten, varpå ankaret sköts nedåt. Scriptet döljer
+  summaryn på desktop och fäller ihop korten på mobil, där "Senaste
+  artiklarna" ska synas direkt. Utan JS står de utfällda men kan fällas
+  ihop manuellt.
 #}
 <script>
   (function () {
     var d = document.querySelector(".sections-toggle");
-    if (d && matchMedia("(min-width: 561px)").matches) {
-      d.open = true;
-      d.classList.add("is-static");
+    if (d) {
+      if (matchMedia("(min-width: 561px)").matches) {
+        d.classList.add("is-static");
+      } else {
+        d.open = false;
+      }
+    }
+    // Hoppa till #-ankaret vid sidladdning. Firefox på desktop utför inte
+    // alltid det inbyggda hoppet när sidan har skript och utfällbara
+    // element som rör layouten (Chromium/Edge gör det). Ta kontroll och
+    // scrolla själv - scrollIntoView är idempotent, så de upprepade
+    // körningarna är no-ops så snart vi står rätt.
+    if (location.hash) {
+      var jump = function () {
+        var t = document.getElementById(location.hash.slice(1));
+        if (t) t.scrollIntoView();
+      };
+      window.addEventListener("load", function () {
+        jump();
+        requestAnimationFrame(jump);
+        setTimeout(jump, 200);
+      });
     }
   })();
 </script>

@@ -41,7 +41,6 @@
 * { box-sizing: border-box; }
 
 html, body { margin: 0; }
-html { scroll-behavior: smooth; }
 
 body {
   background: var(--paper);
@@ -181,13 +180,22 @@ code {
   border-color: var(--accent-soft);
 }
 
+/* Sökrutan och genvägsknappen på samma rad i hero-sektionen. */
+.hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem 1rem;
+  margin-top: 1.1rem;
+}
+.hero-actions .searchbox { margin: 0; flex: 1 1 20rem; }
+
 /* Genväg till "Senaste artiklarna" - bara desktop, där sektionskorten
    fälls ut och annars skjuter listan långt ned. */
 .jump-latest {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  margin-top: 1.1rem;
   padding: 0.45rem 1rem;
   font-size: 0.92rem;
   border: 1px solid var(--line);
