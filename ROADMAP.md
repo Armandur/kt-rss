@@ -43,8 +43,6 @@ i artikellistan.
 
 ## v4
 
-### Klart
-
 - **Mörkt/ljust tema.** Mörk palett som följer OS via `prefers-color-scheme`,
   med en manuell växlingsknapp i headern. Valet sparas i localStorage och
   appliceras FOUC-fritt av ett inline-script i `<head>`; `theme.js` sköter
@@ -57,14 +55,14 @@ i artikellistan.
   ingress, taggar och författare. (Infinite scroll på resultaten kvarstår
   som möjlig påbyggnad.)
 
-### Idéer (ej påbörjat)
+## Längre fram (ej versionsbundet)
 
-- **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
-  304-grenen i pollern finns kvar defensivt om det ändras.
 - **Webbläsarnotiser.** Notis när nya artiklar dykt upp (eller annat
   relevant). Kräver Web Push: en service worker, VAPID-nycklar,
   push-prenumerationer lagrade per klient och utskick från servern.
   Förutsätter HTTPS.
+- **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
+  304-grenen i pollern finns kvar defensivt om det ändras.
 
 ## Utanför scope
 
