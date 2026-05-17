@@ -42,9 +42,11 @@ kt_rss/
                   tag_index.html, author_index.html, archive_index.html,
                   status.html, search.html, notfound.html
   static/         style.css, scroll.js, feedbuilder.js, theme.js, tagcloud.js,
-                  authors.js, newsince.js, suggest.js, live.js, totop.js
+                  authors.js, newsince.js, suggest.js, live.js, totop.js,
+                  kt-rss.svg + kt-rss-{32,64,128,256,512,1024}.png (logotyp)
 tests/            offline mot tests/fixtures/article_response.json
 docs/SPEC.md      fullständig projektspecifikation
+assets/           designkällor utanför runtime (kt-rss.ai)
 ```
 
 ## Datamodell (SQLite)
