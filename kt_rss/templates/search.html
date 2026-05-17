@@ -8,6 +8,9 @@
 
 <header class="list-header">
   <h1>Sök</h1>
+  {% if feed_path %}
+  <a class="feed-badge feed-badge--lg" href="{{ feed_path }}">feed.xml</a>
+  {% endif %}
 </header>
 
 <form class="searchbox" action="/search" method="get" role="search">

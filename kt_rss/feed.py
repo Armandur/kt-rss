@@ -104,6 +104,7 @@ def build_feed(
     tag: str | None = None,
     tags: list[str] | None = None,
     author: str | None = None,
+    query: str | None = None,
     mode: str = "or",
     fmt: str = "atom",
 ) -> bytes:
@@ -124,6 +125,9 @@ def build_feed(
     elif section:
         feed_url = f"{settings.public_url}/feed/{section}.xml"
         title = f"Kyrkans Tidning - {section}"
+    elif query:
+        feed_url = f"{settings.public_url}/feed/search.xml?q={quote(query)}"
+        title = f"Kyrkans Tidning - sök: {query}"
     else:
         feed_url = f"{settings.public_url}/feed.xml"
         title = "Kyrkans Tidning"

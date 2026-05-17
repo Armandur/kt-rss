@@ -254,6 +254,25 @@ def feed_tags(
     )
 
 
+@app.get("/feed/search.xml")
+def feed_search(
+    request: Request,
+    conn_settings=Depends(get_conn_settings),
+    q: str = Query(""),
+    fmt: str = Query("atom", pattern="^(atom|rss)$"),
+) -> Response:
+    conn, settings = conn_settings
+    query = q.strip()
+    if not query:
+        return JSONResponse(
+            status_code=400, content={"error": "saknar sökterm q"}
+        )
+    articles = search_articles(conn, query, limit=settings.max_items)
+    return _feed_response(
+        request, build_feed(settings, articles, query=query, fmt=fmt), fmt
+    )
+
+
 @app.get("/feed/{section}.xml")
 def feed_section(
     section: str,
@@ -615,10 +634,18 @@ def search(
 ):
     conn, settings = conn_settings
     results = search_articles(conn, q, limit=settings.page_size)
+    q_clean = q.strip()
     return templates.TemplateResponse(
         request,
         "search.html",
-        {"q": q, "articles": results, "state": get_fetch_state(conn)},
+        {
+            "q": q,
+            "articles": results,
+            "state": get_fetch_state(conn),
+            "feed_path": (
+                f"/feed/search.xml?q={quote(q_clean)}" if q_clean else None
+            ),
+        },
     )
 
 

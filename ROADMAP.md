@@ -81,6 +81,26 @@ i artikellistan.
   artikelantal totalt och per sektion, vanligaste taggar, skribent- och
   periodspann samt databasstorlek. Headerns poll-status länkar dit.
 
+## v5.1.0 (pågår)
+
+Prioordning enligt nedan.
+
+1. **Sök-feed.** *(klar)* `/feed/search.xml?q=...` - prenumerera på en
+   sökterm. Kopplar FTS5-söket till feed-bygget, analogt med multi-tagg-
+   feeden. `/search`-sidan pekar ut sökningen med feed-autodiscovery och
+   en feed-badge.
+2. **Taggar som `<category>` i feed-items.** Feeden sätter redan sektionen
+   som kategori; artikelns tvättade taggar följer med så RSS-läsare kan
+   filtrera på dem.
+3. **Nytt sedan senaste besök.** Webui markerar artiklar som tillkommit
+   sedan förra besöket - en tidsstämpel i `localStorage`, en diskret
+   markering på nya rader.
+4. **Pollhistorik på statussidan.** En `poll_log`-tabell (tid, status,
+   antal nya) ger en lista över de senaste rundorna och en enkel
+   stapelgraf över artiklar per period.
+5. **Sökförslag.** Taggar och skribenter som autocomplete medan man
+   skriver i sökrutan.
+
 ## Längre fram (ej versionsbundet)
 
 - **Webbläsarnotiser.** Notis när nya artiklar dykt upp (eller annat

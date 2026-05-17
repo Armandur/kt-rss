@@ -86,3 +86,32 @@ def test_route_search(db_path, settings, raw_articles):
         assert client.get("/search").status_code == 200
     finally:
         app.dependency_overrides.clear()
+
+
+def test_route_search_feed(db_path, settings, raw_articles):
+    base = map_article(raw_articles[0], BASE)
+    conn = connect(db_path)
+    upsert_article(conn, replace(base, id="t", title="Unik rubriktext"))
+    conn.commit()
+    conn.close()
+
+    def _override():
+        c = connect(db_path)
+        try:
+            yield c, settings
+        finally:
+            c.close()
+
+    app.dependency_overrides[get_conn_settings] = _override
+    try:
+        client = TestClient(app)
+        feed = client.get("/feed/search.xml?q=unik")
+        assert feed.status_code == 200
+        assert "atom" in feed.headers["content-type"]
+        assert "Unik rubriktext" in feed.text
+        # Utan sökterm -> 400.
+        assert client.get("/feed/search.xml").status_code == 400
+        # /search-sidan pekar ut sök-feeden (autodiscovery + badge).
+        assert "/feed/search.xml?q=unik" in client.get("/search?q=unik").text
+    finally:
+        app.dependency_overrides.clear()

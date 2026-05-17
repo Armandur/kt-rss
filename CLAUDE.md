@@ -93,7 +93,8 @@ skribentöversikt, `/archive` arkivöversikt, `/tags` bygg-en-feed-vy,
 `/search` artikelsök, `/status` status-/statistiksida, `/feed.xml` +
 `/feed/{section}.xml` + `/feed/t/{tag}.xml` +
 `/feed/a/{author}.xml` + `/feed/tags.xml` (flera taggar,
-`?t=a,b&mode=or/and`) Atom (`?fmt=rss` ger RSS). `/feeds.opml` listar
+`?t=a,b&mode=or/and`) + `/feed/search.xml` (`?q=` sökterm) Atom
+(`?fmt=rss` ger RSS). `/feeds.opml` listar
 alla sektionsfeeds. Feed-svaren bär en `ETag` (`_feed_response`) och svarar
 `304` på matchande `If-None-Match`. HTML-vyerna har
 feed-autodiscovery (`<link rel="alternate">`) styrt av `feed_path`. Sektioner och taggar är datadrivna (`section_tag` respektive den
@@ -101,8 +102,9 @@ tvättade `tags`-kolumnen) - hårdkoda aldrig listorna. Taggar tvättas i
 `map_article` (`_clean_tags`); skribenter likaså (`_clean_authors` delar
 flerskribent-bylines på komma och ` och `). Skribentöversikten `/a` delar
 skribenter i redaktion och debatt/insändare utifrån `DEBATE_SECTIONS` i
-`config.py`. `/feed/tags.xml` måste registreras före
-`/feed/{section}.xml` (annars matchas "tags" som ett section-värde).
+`config.py`. De statiska `/feed/tags.xml` och `/feed/search.xml` måste
+registreras före `/feed/{section}.xml` (annars matchas "tags"/"search"
+som section-värden).
 
 ## Vanliga ändringar
 

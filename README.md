@@ -35,6 +35,7 @@ Brödtext återpubliceras aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/feed/t/{tag}.xml` | Atom per tagg (`?fmt=rss` ger RSS 2.0) |
 | `/feed/a/{author}.xml` | Atom per skribent (`?fmt=rss` ger RSS 2.0) |
 | `/feed/tags.xml` | Atom på flera taggar (`?t=a,b&mode=or/and`) |
+| `/feed/search.xml` | Atom på en sökterm (`?q=`) |
 | `/feeds.opml` | OPML med alla sektionsfeeds (importeras i en RSS-läsare) |
 | `/healthz` | JSON-status: antal artiklar, senaste poll m.m. |
 
