@@ -27,7 +27,7 @@
 <p class="lead">
   Alla skribenter i arkivet. Klicka på ett namn för att läsa deras
   artiklar eller prenumerera på en feed. Redaktionens skribenter står
-  först, debatt- och insändarbylines för sig.
+  först, övriga bylines för sig.
 </p>
 
 {% if not editorial and not debate %}
@@ -36,7 +36,7 @@
 <input type="search" class="author-search"
        placeholder="Sök skribent&hellip;" autocomplete="off">
 {% if editorial %}{{ author_group("Redaktionen", editorial) }}{% endif %}
-{% if debate %}{{ author_group("Debatt och insändare", debate) }}{% endif %}
+{% if debate %}{{ author_group("Debatt, insändare och övriga", debate) }}{% endif %}
 {% endif %}
 {% endblock %}
 
