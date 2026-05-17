@@ -552,6 +552,11 @@ code {
 @media (max-width: 560px) {
   .wrap { padding: 0 1rem; }
 
+  /* Tema-knappen bredvid loggan högst upp, inte sist under poll-statusen
+     (där den annars hamnar vid headerns nederkant). */
+  .theme-toggle { order: 1; }
+  .poll-status { order: 2; }
+
   /* Mobil: en liten bild floatar uppe till vänster och texten flödar runt
      den - innehållet är i fokus, bilden är bara en thumbnail. Desktop
      behåller flex-layouten (bild bredvid hela textspalten). */
