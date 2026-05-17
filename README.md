@@ -1,13 +1,18 @@
 # kt-rss
 
-RSS-feeds för Kyrkans Tidning. Tidningen saknar publik RSS-feed, men
-webbplatsens "hämta fler"-knapp anropar ett internt JSON-API. `kt-rss`
-pollar det API:et periodiskt, lagrar artiklarna i SQLite och exponerar
-genererade **Atom/RSS-feeds** - totalt och per sektion - samt ett enkelt
-styleat webbgränssnitt för att bläddra.
+RSS-feeds för Kyrkans Tidning - och ett webbgränssnitt att bläddra dem i.
+Tidningen saknar publik RSS-feed, men webbplatsens "hämta fler"-knapp
+anropar ett internt JSON-API. `kt-rss` pollar det API:et periodiskt,
+lagrar artiklarna i SQLite och blev med tiden två saker i ett:
 
-Feeden innehåller bara rubrik, ingress och länk. Brödtext återpubliceras
-aldrig (se [Innehållspolicy](#innehållspolicy)).
+- **En feed-tillhandahållare** som genererar **Atom/RSS-feeds** - totalt
+  och per sektion, tagg och skribent.
+- **En läsare som inte läser** - ett styleat webbgränssnitt för att
+  bläddra, söka och upptäcka artiklar (listvyer, taggmoln, skribent- och
+  datumarkiv, statussida). Det visar rubrik, ingress och bild men aldrig
+  brödtexten; varje artikel länkar vidare till kyrkanstidning.se.
+
+Brödtext återpubliceras aldrig (se [Innehållspolicy](#innehållspolicy)).
 
 ## Vad du får
 

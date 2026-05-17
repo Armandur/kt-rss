@@ -5,9 +5,16 @@ filstrukturändringar.
 
 ## Vad projektet är
 
-En tjänst som genererar RSS-feeds för Kyrkans Tidning. Pollar tidningens
-interna JSON-API (`https://api.kyrkanstidning.se/article`), lagrar artiklar
-i SQLite, exponerar Atom/RSS-feeds och ett styleat HTML-gränssnitt.
+`kt-rss` pollar Kyrkans Tidnings interna JSON-API
+(`https://api.kyrkanstidning.se/article`), lagrar artiklar i SQLite och
+blev med tiden två saker i ett:
+
+- En **RSS-feed-tillhandahållare** - genererade Atom/RSS-feeds, totalt och
+  per sektion, tagg och skribent.
+- En **"läsare som inte läser"** - ett styleat HTML-gränssnitt för att
+  bläddra, söka och upptäcka artiklar. Det visar rubrik, ingress och bild
+  men aldrig brödtexten; varje artikel länkar vidare till KT
+  (innehållspolicy, se nedan).
 
 Fullständig styrande spec: `docs/SPEC.md`. Den är källan vid tvistefrågor.
 

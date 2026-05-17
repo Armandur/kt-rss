@@ -17,9 +17,13 @@ webbplatsens "hämta fler"-funktion anropar ett internt JSON-API på
 `https://api.kyrkanstidning.se/article`. API:et returnerar strukturerad
 artikeldata: titel, underrubrik, publiceringsdatum, sektion och URL.
 
-Detta projekt bygger en självhostad **feed-generator**: en liten tjänst som
-periodiskt hämtar de senaste artiklarna via JSON-API:et, diffar mot en lokal
-databas, och exponerar genererade Atom/RSS-feeds - totalt och per sektion.
+Detta projekt bygger en självhostad tjänst som periodiskt hämtar de senaste
+artiklarna via JSON-API:et, diffar mot en lokal databas och blev med tiden
+två saker i ett: en **feed-generator** (Atom/RSS totalt och per sektion,
+tagg och skribent) och en **bläddringsyta** - ett webbgränssnitt som
+fungerar som en RSS-läsare för att söka och upptäcka artiklar, men som bara
+visar rubrik, ingress och bild och länkar vidare till KT i stället för att
+återge brödtexten.
 
 **Utvecklingsflöde:**
 1. Utveckling i en Linux-dev-VM med Claude Code.
