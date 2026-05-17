@@ -139,6 +139,11 @@ def build_feed(
     fg.link(href=feed_url, rel="self")
     fg.language("sv")
     fg.author({"name": "Kyrkans Tidning"})
+    # Feed-logga: Atom <logo>/<icon>, RSS <image>. Kvadratisk logotyp ur
+    # static, så den syns i RSS-läsarnas feedlista.
+    logo_url = f"{settings.public_url}/static/kt-rss-256.png"
+    fg.logo(logo_url)
+    fg.icon(logo_url)
     fg.updated(_feed_updated(articles))
 
     for a in articles:

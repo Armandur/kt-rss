@@ -37,6 +37,15 @@ def test_rss_ar_valid_xml(settings, db_path, raw_articles):
     assert len(items) == len(rows)
 
 
+def test_feed_logga(settings, db_path, raw_articles):
+    rows = _seed(db_path, raw_articles)
+    atom = build_feed(settings, rows, fmt="atom").decode()
+    assert "<logo>" in atom and "<icon>" in atom
+    assert "/static/kt-rss-256.png" in atom
+    rss = build_feed(settings, rows, fmt="rss").decode()
+    assert "<image>" in rss and "/static/kt-rss-256.png" in rss
+
+
 def test_feed_kategorier_per_tagg(settings, db_path, raw_articles):
     base = map_article(raw_articles[0], "https://www.kyrkanstidning.se")
     conn = connect(db_path)
