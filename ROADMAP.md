@@ -98,8 +98,9 @@ Prioordning enligt nedan.
 4. **Pollhistorik på statussidan.** *(klar)* En `poll_log`-tabell (tid,
    status, hämtade/nya/uppdaterade) ger en lista över de senaste rundorna,
    och en stapelgraf visar artiklar per månad de senaste året.
-5. **Sökförslag.** Taggar och skribenter som autocomplete medan man
-   skriver i sökrutan.
+5. **Sökförslag.** *(klar)* `/suggest` ger taggar och skribenter som
+   matchar; `suggest.js` visar dem i en dropdown under sökrutan och ett
+   klick navigerar till tagg- eller skribentvyn.
 6. **Liveuppdatering av öppen sida.** En öppen flik visar nya artiklar
    utan omladdning - frågar periodiskt en endpoint om det finns nyare och
    infogar dem överst (med "Ny"-pill). Lättare än webbläsarnotiser, ingen

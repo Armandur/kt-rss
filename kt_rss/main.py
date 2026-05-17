@@ -650,6 +650,21 @@ def search(
     )
 
 
+@app.get("/suggest")
+def suggest(
+    conn_settings=Depends(get_conn_settings),
+    q: str = Query(""),
+) -> JSONResponse:
+    """Förslag på taggar och skribenter för sökrutans autocomplete."""
+    conn, _ = conn_settings
+    term = q.strip().lower()
+    if len(term) < 2:
+        return JSONResponse({"tags": [], "authors": []})
+    tags = [t for t, _ in list_tags(conn) if term in t][:6]
+    authors = [a for a, _ in list_authors(conn) if term in a.lower()][:6]
+    return JSONResponse({"tags": tags, "authors": authors})
+
+
 # --------------------------------------------------------------------------
 # Health
 # --------------------------------------------------------------------------

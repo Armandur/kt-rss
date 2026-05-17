@@ -115,3 +115,31 @@ def test_route_search_feed(db_path, settings, raw_articles):
         assert "/feed/search.xml?q=unik" in client.get("/search?q=unik").text
     finally:
         app.dependency_overrides.clear()
+
+
+def test_route_suggest(db_path, settings, raw_articles):
+    base = map_article(raw_articles[0], BASE)
+    conn = connect(db_path)
+    upsert_article(conn, replace(
+        base, id="t", tags="biskopsval, kyrka", author="Jonatan Sverker"))
+    conn.commit()
+    conn.close()
+
+    def _override():
+        c = connect(db_path)
+        try:
+            yield c, settings
+        finally:
+            c.close()
+
+    app.dependency_overrides[get_conn_settings] = _override
+    try:
+        client = TestClient(app)
+        # Tagg-förslag på delsträng.
+        assert "biskopsval" in client.get("/suggest?q=bisk").json()["tags"]
+        # Skribentförslag, versal-okänsligt.
+        assert "Jonatan Sverker" in client.get("/suggest?q=jonatan").json()["authors"]
+        # Kort term ger inga förslag.
+        assert client.get("/suggest?q=b").json() == {"tags": [], "authors": []}
+    finally:
+        app.dependency_overrides.clear()
