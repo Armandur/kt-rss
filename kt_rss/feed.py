@@ -158,3 +158,25 @@ def build_feed(
     if fmt == "rss":
         return fg.rss_str(pretty=True)
     return _fix_atom_enclosure_links(fg.atom_str(pretty=True))
+
+
+def build_opml(settings: Settings, sections: list[str]) -> bytes:
+    """OPML 2.0 med projektets feeds (totalt + per sektion) för import i en
+    RSS-läsare i ett svep. URL:erna är absoluta via `public_url`.
+    """
+    base = settings.public_url
+    opml = ET.Element("opml", version="2.0")
+    head = ET.SubElement(opml, "head")
+    ET.SubElement(head, "title").text = "KT-RSS - Kyrkans Tidning"
+    body = ET.SubElement(opml, "body")
+    ET.SubElement(
+        body, "outline", text="Alla artiklar", type="rss",
+        xmlUrl=f"{base}/feed.xml", htmlUrl=f"{base}/articles",
+    )
+    for section in sections:
+        ET.SubElement(
+            body, "outline", text=section, type="rss",
+            xmlUrl=f"{base}/feed/{quote(section)}.xml",
+            htmlUrl=f"{base}/s/{quote(section)}",
+        )
+    return ET.tostring(opml, encoding="utf-8", xml_declaration=True)

@@ -24,6 +24,7 @@ aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/feed/{section}.xml` | Atom per sektion (`?fmt=rss` ger RSS 2.0) |
 | `/feed/t/{tag}.xml` | Atom per tagg (`?fmt=rss` ger RSS 2.0) |
 | `/feed/tags.xml` | Atom på flera taggar (`?t=a,b&mode=or/and`) |
+| `/feeds.opml` | OPML med alla sektionsfeeds (importeras i en RSS-läsare) |
 | `/healthz` | JSON-status: antal artiklar, senaste poll m.m. |
 
 Sektioner härleds från datan (`section_tag`) - inget hårdkodas.

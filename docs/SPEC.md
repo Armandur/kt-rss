@@ -339,6 +339,7 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 | GET   | `/feed/{section}.xml` | Atom filtrerad på `section_tag`                   |
 | GET   | `/feed/t/{tag}.xml`   | Atom filtrerad på en tvättad tagg                 |
 | GET   | `/feed/tags.xml`      | Atom på flera taggar (`?t=a,b&mode=or/and`)       |
+| GET   | `/feeds.opml`         | OPML med alla sektionsfeeds                       |
 | GET   | `/healthz`            | JSON: status, antal, senaste lyckad poll          |
 | GET   | `/`                   | HTML-startsida: sektionskort + feed-länkar        |
 | GET   | `/articles`           | HTML-lista, alla artiklar                         |

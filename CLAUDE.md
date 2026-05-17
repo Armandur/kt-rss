@@ -79,7 +79,8 @@ timeout + få retries, endast GET. Se `api_client.py` och spec §3.
 taggöversikt, `/tags` bygg-en-feed-vy, `/search` artikelsök, `/feed.xml` +
 `/feed/{section}.xml` + `/feed/t/{tag}.xml` +
 `/feed/tags.xml` (flera taggar, `?t=a,b&mode=or/and`) Atom (`?fmt=rss` ger
-RSS). Sektioner och taggar är datadrivna (`section_tag` respektive den
+RSS). `/feeds.opml` listar alla sektionsfeeds. HTML-vyerna har
+feed-autodiscovery (`<link rel="alternate">`) styrt av `feed_path`. Sektioner och taggar är datadrivna (`section_tag` respektive den
 tvättade `tags`-kolumnen) - hårdkoda aldrig listorna. Taggar tvättas i
 `map_article` (`_clean_tags`). `/feed/tags.xml` måste registreras före
 `/feed/{section}.xml` (annars matchas "tags" som ett section-värde).

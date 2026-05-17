@@ -127,3 +127,16 @@ def test_ingen_enclosure_utan_bild(settings, db_path, raw_articles):
 def test_tom_feed_ar_valid(settings):
     ET.fromstring(build_feed(settings, [], fmt="atom"))
     ET.fromstring(build_feed(settings, [], fmt="rss"))
+
+
+def test_build_opml(settings):
+    from kt_rss.feed import build_opml
+    root = ET.fromstring(build_opml(settings, ["nyhet", "debatt"]))
+    outlines = root.findall(".//outline")
+    # En outline för "alla" + en per sektion.
+    assert len(outlines) == 3
+    urls = [o.get("xmlUrl") for o in outlines]
+    assert f"{settings.public_url}/feed.xml" in urls
+    assert f"{settings.public_url}/feed/nyhet.xml" in urls
+    # Absoluta URL:er - en OPML importeras i en extern läsare.
+    assert all(u.startswith("http") for u in urls)

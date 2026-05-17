@@ -37,7 +37,7 @@ from kt_rss.db import (
     search_articles,
 )
 from kt_rss.db import STATUS_OK, STATUS_SKIPPED_304
-from kt_rss.feed import build_feed, build_image_url
+from kt_rss.feed import build_feed, build_image_url, build_opml
 from kt_rss.scheduler import create_scheduler
 
 logger = logging.getLogger("kt_rss")
@@ -254,6 +254,15 @@ def feed_tag(
         )
     articles = get_articles(conn, tag=tag_l, limit=settings.max_items)
     return _feed_response(build_feed(settings, articles, tag=tag_l, fmt=fmt), fmt)
+
+
+@app.get("/feeds.opml")
+def feeds_opml(conn_settings=Depends(get_conn_settings)) -> Response:
+    conn, settings = conn_settings
+    return Response(
+        content=build_opml(settings, _known_sections(conn)),
+        media_type="text/x-opml; charset=utf-8",
+    )
 
 
 # --------------------------------------------------------------------------

@@ -55,26 +55,29 @@ i artikellistan.
   ingress, taggar och författare. (Infinite scroll på resultaten kvarstår
   som möjlig påbyggnad.)
 
-## v5 - idéer (ej påbörjat)
+## v5
 
-Prioordning enligt nedan: snabba feed-förbättringar först, drift-finessen
-sist.
+### Klart
 
-1. **Feed-autodiscovery.** `<link rel="alternate" type="application/atom+xml">`
-   i `<head>` på HTML-vyerna, så RSS-läsare hittar rätt feed automatiskt när
-   en webui-URL klistras in. Varje vy pekar på sin egen feed (`/` → `/feed.xml`,
-   `/s/{section}` → `/feed/{section}.xml` osv).
-2. **OPML-export.** `/feeds.opml` som listar alla sektionsfeeds, för import
-   i en RSS-läsare i ett svep.
-3. **Författarvyer.** `/a/{author}` HTML-lista och `/feed/a/{author}.xml`,
+- **Feed-autodiscovery.** `<link rel="alternate" type="application/atom+xml">`
+  i `<head>` på HTML-vyerna - RSS-läsare hittar rätt feed automatiskt när
+  en webui-URL klistras in.
+- **OPML-export.** `/feeds.opml` listar alla sektionsfeeds (absoluta URL:er)
+  för import i en RSS-läsare i ett svep.
+
+### Idéer (ej påbörjat)
+
+Prioordning enligt nedan.
+
+1. **Författarvyer.** `/a/{author}` HTML-lista och `/feed/a/{author}.xml`,
    analogt med tagg-vyerna. `author` (`byline_names`) finns redan i `articles`.
-4. **Conditional requests på egna feeds.** Skicka `ETag`/`Last-Modified` på
+2. **Conditional requests på egna feeds.** Skicka `ETag`/`Last-Modified` på
    feed-svaren och svara `304` på `If-None-Match`/`If-Modified-Since` -
    sparar bandbredd för prenumeranterna. Skilt från Längre fram-punkten
    med samma namn, som rör kt-rss *som klient* mot KT.
-5. **Datumarkiv.** `/archive/{år}/{månad}` för att bläddra äldre artiklar
+3. **Datumarkiv.** `/archive/{år}/{månad}` för att bläddra äldre artiklar
    per period - användbart nu när arkivet är tiotusentals artiklar.
-6. **Status- och statistiksida.** En HTML-vy med pollhistorik, artikelantal
+4. **Status- och statistiksida.** En HTML-vy med pollhistorik, artikelantal
    per sektion/tagg och DB-storlek - insyn utöver `/healthz`.
 
 ## Längre fram (ej versionsbundet)
