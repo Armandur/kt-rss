@@ -49,6 +49,9 @@ i artikellistan.
   med en manuell växlingsknapp i headern. Valet sparas i localStorage och
   appliceras FOUC-fritt av ett inline-script i `<head>`; `theme.js` sköter
   knappen, `[data-theme]` på `<html>` styr override.
+- **Bläddra via taggar.** `/t` visar ett sökbart taggmoln (storlek efter
+  artikelantal) att klicka sig in i `/t/{tag}` från. `tagcloud.js` sköter
+  sökfiltret.
 
 ### Idéer (ej påbörjat)
 
@@ -56,9 +59,6 @@ i artikellistan.
   och ingress, utan ranking eller paginering. Uppslag: SQLite FTS5 för
   ordmatchning och relevans, sök även i taggar och författare, korrekt
   åäö-hantering, infinite scroll på resultaten.
-- **Bläddra via taggar.** En översiktsvy som listar alla taggar (taggmoln
-  eller sökbar lista) att klicka sig in i `/t/{tag}` från. I dag når man
-  taggvyerna bara via pills på artiklar eller `/tags`-feedbyggaren.
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
 - **Webbläsarnotiser.** Notis när nya artiklar dykt upp (eller annat

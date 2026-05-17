@@ -16,6 +16,7 @@ aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/` | Startsida: sektionskort + feed-länkar |
 | `/articles` | Stylead HTML-lista, alla artiklar |
 | `/s/{section}` | Stylead HTML-lista per sektion |
+| `/t` | Taggöversikt - taggmoln att bläddra från |
 | `/t/{tag}` | Stylead HTML-lista per tagg |
 | `/tags` | Bygg en feed på flera taggar (sök + kryssrutor) |
 | `/search` | Sök artiklar på rubrik och ingress (`?q=`) |

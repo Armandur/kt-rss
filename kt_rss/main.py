@@ -126,6 +126,28 @@ def _known_tags(conn) -> list[str]:
     return [tag for tag, _ in list_tags(conn)]
 
 
+def _tag_cloud(tags: list[tuple[str, int]]) -> list[tuple[str, int, int]]:
+    """Lägger en storleksnivå 1-4 på varje tagg, kvantil-baserad.
+
+    Taggarna delas i fyra lika stora grupper efter artikelantal, så
+    fördelningen blir jämn oavsett hur skev count-fördelningen är. Storleken
+    speglar alltså rang ("bland de 25 % mest använda"), inte absolut antal -
+    en log- eller linjär skala klumpar nästan allt på minsta nivån.
+    Ordningen i utdata följer inordningen (alfabetisk från list_tags).
+    """
+    if not tags:
+        return []
+    n = len(tags)
+    rank = {
+        tag: i
+        for i, (tag, _) in enumerate(sorted(tags, key=lambda tc: tc[1]))
+    }
+    return [
+        (tag, count, 1 + min(3, rank[tag] * 4 // n))
+        for tag, count in tags
+    ]
+
+
 def _paginate(base_path: str, page: int, total: int, page_size: int) -> dict:
     """Pagineringsdata för en HTML-lista.
 
@@ -375,6 +397,16 @@ def tag_feed_builder(request: Request, conn_settings=Depends(get_conn_settings))
         request,
         "tags.html",
         {"tags": list_tags(conn), "state": get_fetch_state(conn)},
+    )
+
+
+@app.get("/t", response_class=HTMLResponse)
+def tag_index(request: Request, conn_settings=Depends(get_conn_settings)):
+    conn, settings = conn_settings
+    return templates.TemplateResponse(
+        request,
+        "tag_index.html",
+        {"cloud": _tag_cloud(list_tags(conn)), "state": get_fetch_state(conn)},
     )
 
 

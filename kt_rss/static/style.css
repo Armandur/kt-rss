@@ -396,6 +396,42 @@ code {
   border-color: var(--accent);
 }
 
+/* --- Tagg-översikt / taggmoln (/t) --- */
+.tag-search {
+  font: inherit;
+  width: 100%;
+  max-width: 22rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--ink);
+}
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  padding-bottom: 2.5rem;
+}
+.tag-cloud-item {
+  text-decoration: none;
+  color: var(--accent);
+  line-height: 1.3;
+}
+.tag-cloud-item:hover { text-decoration: underline; }
+.tc-count {
+  font-size: 0.7em;
+  color: var(--ink-soft);
+  margin-left: 0.15rem;
+}
+.lvl-1 { font-size: 0.9rem; }
+.lvl-2 { font-size: 1.1rem; }
+.lvl-3 { font-size: 1.4rem; }
+.lvl-4 { font-size: 1.8rem; }
+
 /* --- Tagg-feed-byggare (/tags) --- */
 .feedbuilder { margin: 0.5rem 0 1.4rem; }
 

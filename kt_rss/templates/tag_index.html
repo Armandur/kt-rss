@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}KT-RSS | Taggar{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="/">Start</a><span>/</span><span class="here">Taggar</span>
+</nav>
+
+<header class="list-header">
+  <h1>Taggar</h1>
+</header>
+
+<p class="lead">
+  Bläddra bland artiklarnas taggar - större tagg betyder fler artiklar.
+  Vill du i stället ha en feed på flera taggar, gå till
+  <a href="/tags">feed-byggaren</a>.
+</p>
+
+{% if not cloud %}
+<p class="empty">Inga taggar än. Listan fylls vid nästa poll.</p>
+{% else %}
+<input type="search" class="tag-search"
+       placeholder="Sök tagg&hellip;" autocomplete="off">
+<div class="tag-cloud">
+  {% for tag, count, level in cloud %}
+  <a class="tag-cloud-item lvl-{{ level }}" href="/t/{{ tag|urlencode }}"
+     data-tag="{{ tag }}">{{ tag }}<span class="tc-count">{{ count }}</span></a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/tagcloud.js" defer></script>
+{% endblock %}

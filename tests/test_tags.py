@@ -12,7 +12,7 @@ from kt_rss.db import (
     map_article,
     upsert_article,
 )
-from kt_rss.main import app, get_conn_settings
+from kt_rss.main import _tag_cloud, app, get_conn_settings
 
 BASE = "https://www.kyrkanstidning.se"
 
@@ -144,5 +144,37 @@ def test_route_feed_tags(db_path, settings, raw_articles):
         assert client.get("/feed/tags.xml?t=nyhet&mode=xor").status_code == 422
         # Bygg-UI-sidan renderar.
         assert client.get("/tags").status_code == 200
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_tag_cloud_nivaer():
+    assert _tag_cloud([]) == []
+    # En tagg med fler artiklar får en högre (eller lika) nivå, 1-4.
+    levels = {t: lvl for t, _, lvl in _tag_cloud([("liten", 1), ("stor", 80)])}
+    assert levels["stor"] > levels["liten"]
+    assert all(1 <= v <= 4 for v in levels.values())
+
+
+def test_route_tag_index(db_path, settings, raw_articles):
+    base = map_article(raw_articles[0], BASE)
+    conn = connect(db_path)
+    upsert_article(conn, replace(base, id="x1", tags="nyhet, kyrka"))
+    conn.commit()
+    conn.close()
+
+    def _override():
+        c = connect(db_path)
+        try:
+            yield c, settings
+        finally:
+            c.close()
+
+    app.dependency_overrides[get_conn_settings] = _override
+    try:
+        client = TestClient(app)
+        r = client.get("/t")
+        assert r.status_code == 200
+        assert "tag-cloud" in r.text
     finally:
         app.dependency_overrides.clear()

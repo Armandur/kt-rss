@@ -338,6 +338,7 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 | GET   | `/`                   | HTML-startsida: sektionskort + feed-länkar        |
 | GET   | `/articles`           | HTML-lista, alla artiklar                         |
 | GET   | `/s/{section}`        | HTML-lista filtrerad på `section_tag`             |
+| GET   | `/t`                  | HTML: taggöversikt (taggmoln)                     |
 | GET   | `/t/{tag}`            | HTML-lista filtrerad på en tvättad tagg           |
 | GET   | `/tags`               | HTML: bygg en feed på flera taggar                |
 | GET   | `/search`             | HTML: sök artiklar på titel/ingress (`?q=`)       |

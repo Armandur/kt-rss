@@ -31,8 +31,9 @@ kt_rss/
   feed.py         feedgen: Atom/RSS-serialisering
   backfill.py     manuell CLI-backfill + uppstarts-backfill (spec §8.1)
   main.py         FastAPI-app: feeds, HTML-vyer, /healthz, lifespan
-  templates/      base.html, index.html, list.html, _articles.html, tags.html, notfound.html
-  static/         style.css, scroll.js, feedbuilder.js (/tags), theme.js (mörkt/ljust)
+  templates/      base.html, index.html, list.html, _articles.html, tags.html,
+                  tag_index.html, search.html, notfound.html
+  static/         style.css, scroll.js, feedbuilder.js, theme.js, tagcloud.js
 tests/            offline mot tests/fixtures/article_response.json
 docs/SPEC.md      fullständig projektspecifikation
 ```
@@ -72,9 +73,9 @@ timeout + få retries, endast GET. Se `api_client.py` och spec §3.
 
 ## URL-schema
 
-`/` index, `/articles` + `/s/{section}` + `/t/{tag}` HTML-listor, `/tags`
-bygg-en-feed-vy, `/search` artikelsök, `/feed.xml` + `/feed/{section}.xml` +
-`/feed/t/{tag}.xml` +
+`/` index, `/articles` + `/s/{section}` + `/t/{tag}` HTML-listor, `/t`
+taggöversikt, `/tags` bygg-en-feed-vy, `/search` artikelsök, `/feed.xml` +
+`/feed/{section}.xml` + `/feed/t/{tag}.xml` +
 `/feed/tags.xml` (flera taggar, `?t=a,b&mode=or/and`) Atom (`?fmt=rss` ger
 RSS). Sektioner och taggar är datadrivna (`section_tag` respektive den
 tvättade `tags`-kolumnen) - hårdkoda aldrig listorna. Taggar tvättas i
