@@ -365,6 +365,8 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 - Item: `title`=`title`; `id`/`guid`/`link`=absolut URL;
   `updated`/`published`=`published_at`; `summary`=`subtitle` (tom → utelämna
   eller kicker); `author`=`author` om satt.
+- Kategorier: artikelns `section` och varje tvättad tagg läggs som
+  `<category>` på feed-itemet.
 - Enclosure: artikelbilden (§2.2) som `<enclosure>` (RSS) / `<link
   rel="enclosure">` (Atom) när `image_id` finns och
   `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` är på.

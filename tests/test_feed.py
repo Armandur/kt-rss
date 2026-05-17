@@ -37,6 +37,22 @@ def test_rss_ar_valid_xml(settings, db_path, raw_articles):
     assert len(items) == len(rows)
 
 
+def test_feed_kategorier_per_tagg(settings, db_path, raw_articles):
+    base = map_article(raw_articles[0], "https://www.kyrkanstidning.se")
+    conn = connect(db_path)
+    upsert_article(conn, replace(
+        base, id="k", section="kultur", tags="bok, recension"))
+    conn.commit()
+    rows = get_articles(conn)
+    conn.close()
+    entry = ET.fromstring(build_feed(settings, rows, fmt="atom")).find(
+        f"{ATOM_NS}entry"
+    )
+    terms = {c.get("term") for c in entry.findall(f"{ATOM_NS}category")}
+    # Sektionen och varje tvättad tagg blir en egen kategori.
+    assert terms == {"kultur", "bok", "recension"}
+
+
 def test_feeden_innehaller_aldrig_ordet_bodytext(settings, db_path, raw_articles):
     rows = _seed(db_path, raw_articles)
     atom = build_feed(settings, rows, fmt="atom").decode("utf-8").lower()

@@ -158,6 +158,11 @@ def build_feed(
             fe.author({"name": a["author"]})
         if a["section"]:
             fe.category(term=a["section"], label=a["section"])
+        # Artikelns tvättade taggar som ytterligare kategorier - RSS-läsare
+        # kan då filtrera/gruppera på dem.
+        for tag in (a["tags"] or "").split(", "):
+            if tag:
+                fe.category(term=tag, label=tag)
         # Bild-enclosure (spec SS2.2). RSS får ett korrekt <enclosure>;
         # Atom-länken lagas i efterhand pga en feedgen-bug (se
         # _fix_atom_enclosure_links).

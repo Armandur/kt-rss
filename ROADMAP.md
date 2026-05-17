@@ -89,9 +89,9 @@ Prioordning enligt nedan.
    sökterm. Kopplar FTS5-söket till feed-bygget, analogt med multi-tagg-
    feeden. `/search`-sidan pekar ut sökningen med feed-autodiscovery och
    en feed-badge.
-2. **Taggar som `<category>` i feed-items.** Feeden sätter redan sektionen
-   som kategori; artikelns tvättade taggar följer med så RSS-läsare kan
-   filtrera på dem.
+2. **Taggar som `<category>` i feed-items.** *(klar)* Feeden sätter redan
+   sektionen som kategori; artikelns tvättade taggar följer nu med så
+   RSS-läsare kan filtrera på dem.
 3. **Nytt sedan senaste besök.** Webui markerar artiklar som tillkommit
    sedan förra besöket - en tidsstämpel i `localStorage`, en diskret
    markering på nya rader.
