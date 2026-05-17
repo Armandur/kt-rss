@@ -162,6 +162,7 @@ code {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--card);
+  color: var(--ink);
 }
 .searchbox button {
   font: inherit;
@@ -450,6 +451,7 @@ code {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--card);
+  color: var(--ink);
 }
 
 .fb-mode {
