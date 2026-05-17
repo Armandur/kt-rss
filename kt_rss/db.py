@@ -343,16 +343,18 @@ def get_articles(
     section: str | None = None,
     tag: str | None = None,
     author: str | None = None,
+    period: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> list[sqlite3.Row]:
     """Artiklar sorterade på published_at fallande.
 
-    Filtrerar på `section`, `tag` eller `author` om angivet. `tag` matchas
-    mot en hel token i den ', '-joinade tags-kolumnen - inte som delsträng,
-    så 'kyrka' träffar inte 'svenska kyrkan'. `author` matchas likadant mot
-    author-kolumnen, så en flerskribent-artikel träffas av var och en av
-    sina skribenter. `offset` hoppar förbi rader (paginering).
+    Filtrerar på `section`, `tag`, `author` eller `period` om angivet. `tag`
+    matchas mot en hel token i den ', '-joinade tags-kolumnen - inte som
+    delsträng, så 'kyrka' träffar inte 'svenska kyrkan'. `author` matchas
+    likadant mot author-kolumnen, så en flerskribent-artikel träffas av var
+    och en av sina skribenter. `period` ('YYYY-MM') matchar publicerings-
+    månaden via published_at-prefix. `offset` hoppar förbi rader (paginering).
     """
     if tag is not None:
         return conn.execute(
@@ -367,6 +369,12 @@ def get_articles(
             "WHERE instr(', ' || author || ', ', ', ' || ? || ', ') > 0 "
             "ORDER BY published_at DESC LIMIT ? OFFSET ?",
             (author, limit, offset),
+        ).fetchall()
+    if period is not None:
+        return conn.execute(
+            "SELECT * FROM articles WHERE published_at LIKE ? "
+            "ORDER BY published_at DESC LIMIT ? OFFSET ?",
+            (period + "%", limit, offset),
         ).fetchall()
     if section is None:
         return conn.execute(
@@ -484,6 +492,19 @@ def list_authors_split(
     red = sorted((n, c) for n, c in counts.items() if n in editorial)
     deb = sorted((n, c) for n, c in counts.items() if n not in editorial)
     return red, deb
+
+
+def list_archive_months(conn: sqlite3.Connection) -> list[sqlite3.Row]:
+    """Publiceringsmånader (year, month, count), nyaste först - för /archive.
+
+    `year`/`month` är strängar ur published_at-prefixet ('2026', '05').
+    """
+    return conn.execute(
+        "SELECT substr(published_at, 1, 4) AS year, "
+        "substr(published_at, 6, 2) AS month, COUNT(*) AS count "
+        "FROM articles WHERE published_at <> '' "
+        "GROUP BY year, month ORDER BY year DESC, month DESC"
+    ).fetchall()
 
 
 def list_tags(conn: sqlite3.Connection) -> list[tuple[str, int]]:

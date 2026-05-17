@@ -32,8 +32,10 @@ kt_rss/
   backfill.py     manuell CLI-backfill + uppstarts-backfill (spec §8.1)
   main.py         FastAPI-app: feeds, HTML-vyer, /healthz, lifespan
   templates/      base.html, index.html, list.html, _articles.html, tags.html,
-                  tag_index.html, search.html, notfound.html
-  static/         style.css, scroll.js, feedbuilder.js, theme.js, tagcloud.js
+                  tag_index.html, author_index.html, archive_index.html,
+                  search.html, notfound.html
+  static/         style.css, scroll.js, feedbuilder.js, theme.js, tagcloud.js,
+                  authors.js
 tests/            offline mot tests/fixtures/article_response.json
 docs/SPEC.md      fullständig projektspecifikation
 ```
@@ -79,8 +81,9 @@ timeout + få retries, endast GET. Se `api_client.py` och spec §3.
 ## URL-schema
 
 `/` index, `/articles` + `/s/{section}` + `/t/{tag}` + `/a/{author}`
-HTML-listor, `/t` taggöversikt, `/a` skribentöversikt, `/tags`
-bygg-en-feed-vy, `/search`
++ `/archive/{år}/{månad}` HTML-listor, `/t` taggöversikt, `/a`
+skribentöversikt, `/archive` arkivöversikt, `/tags` bygg-en-feed-vy,
+`/search`
 artikelsök, `/feed.xml` + `/feed/{section}.xml` + `/feed/t/{tag}.xml` +
 `/feed/a/{author}.xml` + `/feed/tags.xml` (flera taggar,
 `?t=a,b&mode=or/and`) Atom (`?fmt=rss` ger RSS). `/feeds.opml` listar

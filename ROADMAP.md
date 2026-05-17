@@ -76,14 +76,15 @@ i artikellistan.
   `If-None-Match` får `304 Not Modified` utan kropp och sparar bandbredd.
   `_feed_response` i `main.py`. Klient-sidan mot KT:s API - att *skicka*
   validatorer och hantera 304 - fanns redan i `api_client`/`poller`.
+- **Datumarkiv.** `/archive` listar publiceringsmånader grupperade per år;
+  `/archive/{år}/{månad}` är en artikellista för månaden med samma infinite
+  scroll som övriga listvyer. Filtrerar på `published_at`-prefix.
 
 ### Idéer (ej påbörjat)
 
 Prioordning enligt nedan.
 
-1. **Datumarkiv.** `/archive/{år}/{månad}` för att bläddra äldre artiklar
-   per period - användbart nu när arkivet är tiotusentals artiklar.
-2. **Status- och statistiksida.** En HTML-vy med pollhistorik, artikelantal
+1. **Status- och statistiksida.** En HTML-vy med pollhistorik, artikelantal
    per sektion/tagg och DB-storlek - insyn utöver `/healthz`.
 
 ## Längre fram (ej versionsbundet)

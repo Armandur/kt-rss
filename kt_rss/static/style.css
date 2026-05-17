@@ -435,9 +435,11 @@ code {
 .lvl-3 { font-size: 1.4rem; }
 .lvl-4 { font-size: 1.8rem; }
 
-/* --- Skribentöversikt (/a) --- */
-.author-group { margin-bottom: 2rem; }
-.author-group h2 {
+/* --- Skribent- (/a) och arkivöversikt (/archive) --- */
+.author-group,
+.archive-year { margin-bottom: 2rem; }
+.author-group h2,
+.archive-year h2 {
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--ink-soft);
@@ -445,14 +447,16 @@ code {
   padding-bottom: 0.3rem;
   border-bottom: 1px solid var(--line);
 }
-.author-list {
+.author-list,
+.archive-months {
   list-style: none;
   padding: 0;
   margin: 0;
   columns: 2;
   column-gap: 2rem;
 }
-.author-list li {
+.author-list li,
+.archive-months li {
   break-inside: avoid;
   display: flex;
   justify-content: space-between;
@@ -462,12 +466,15 @@ code {
 /* display: flex ovan skuggar annars [hidden] - sökfiltret i authors.js
    sätter hidden på li:na, så den måste vinna tillbaka. */
 .author-list li[hidden] { display: none; }
-.author-list a {
+.author-list a,
+.archive-months a {
   text-decoration: none;
   color: var(--accent);
 }
-.author-list a:hover { text-decoration: underline; }
-.author-count {
+.author-list a:hover,
+.archive-months a:hover { text-decoration: underline; }
+.author-count,
+.archive-count {
   font-size: 0.8rem;
   color: var(--ink-soft);
 }
@@ -610,5 +617,6 @@ code {
   }
 
   .section-links { columns: 1; }
-  .author-list { columns: 1; }
+  .author-list,
+  .archive-months { columns: 1; }
 }

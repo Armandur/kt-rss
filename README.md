@@ -20,6 +20,8 @@ aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/t/{tag}` | Stylead HTML-lista per tagg |
 | `/a` | Skribentöversikt - sökbar lista, delad i redaktion och debatt |
 | `/a/{author}` | Stylead HTML-lista per skribent |
+| `/archive` | Datumarkiv - publiceringsmånader per år |
+| `/archive/{år}/{månad}` | Stylead HTML-lista per publiceringsmånad |
 | `/tags` | Bygg en feed på flera taggar (sök + kryssrutor) |
 | `/search` | Sök artiklar på rubrik och ingress (`?q=`) |
 | `/feed.xml` | Atom, alla sektioner (`?fmt=rss` ger RSS 2.0) |

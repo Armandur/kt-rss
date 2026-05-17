@@ -15,6 +15,7 @@ import hashlib
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from itertools import groupby
 from pathlib import Path
 from urllib.parse import quote
 from zoneinfo import ZoneInfo
@@ -33,6 +34,7 @@ from kt_rss.db import (
     get_articles_for_tags,
     get_fetch_state,
     init_db,
+    list_archive_months,
     list_authors,
     list_authors_split,
     list_sections,
@@ -491,6 +493,79 @@ def articles_author(
             "title": author,
             "section": None,
             "feed_path": f"/feed/a/{quote(author)}.xml",
+            "state": get_fetch_state(conn),
+            "pagination": pg,
+        },
+    )
+
+
+@app.get("/archive", response_class=HTMLResponse)
+def archive_index(request: Request, conn_settings=Depends(get_conn_settings)):
+    conn, settings = conn_settings
+    years = [
+        (
+            year,
+            [
+                {
+                    "month": int(r["month"]),
+                    "name": SV_MONTHS[int(r["month"])],
+                    "count": r["count"],
+                }
+                for r in items
+            ],
+        )
+        for year, items in groupby(
+            list_archive_months(conn), key=lambda r: r["year"]
+        )
+    ]
+    return templates.TemplateResponse(
+        request,
+        "archive_index.html",
+        {"years": years, "state": get_fetch_state(conn)},
+    )
+
+
+@app.get("/archive/{year}/{month}", response_class=HTMLResponse)
+def archive_month(
+    year: int,
+    month: int,
+    request: Request,
+    conn_settings=Depends(get_conn_settings),
+    page: int = Query(1, ge=1),
+    partial: int = Query(0),
+):
+    conn, settings = conn_settings
+    period = f"{year:04d}-{month:02d}"
+    counts = {
+        f"{r['year']}-{r['month']}": r["count"]
+        for r in list_archive_months(conn)
+    }
+    if period not in counts:
+        return templates.TemplateResponse(
+            request,
+            "notfound.html",
+            {"kind": "period", "name": period,
+             "sections": _known_sections(conn)},
+            status_code=404,
+        )
+    pg = _paginate(
+        f"/archive/{year}/{month}", page, counts[period], settings.page_size
+    )
+    articles = get_articles(
+        conn, period=period, limit=settings.page_size, offset=pg["offset"]
+    )
+    if partial:
+        return templates.TemplateResponse(
+            request, "_articles.html", {"articles": articles}
+        )
+    return templates.TemplateResponse(
+        request,
+        "list.html",
+        {
+            "articles": articles,
+            "title": f"{SV_MONTHS[month].capitalize()} {year}",
+            "section": None,
+            "feed_path": None,
             "state": get_fetch_state(conn),
             "pagination": pg,
         },
