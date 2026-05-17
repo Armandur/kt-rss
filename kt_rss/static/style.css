@@ -459,6 +459,9 @@ code {
   gap: 0.5rem;
   padding: 0.25rem 0;
 }
+/* display: flex ovan skuggar annars [hidden] - sökfiltret i authors.js
+   sätter hidden på li:na, så den måste vinna tillbaka. */
+.author-list li[hidden] { display: none; }
 .author-list a {
   text-decoration: none;
   color: var(--accent);
