@@ -347,6 +347,7 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 | GET   | `/s/{section}`        | HTML-lista filtrerad på `section_tag`             |
 | GET   | `/t`                  | HTML: taggöversikt (taggmoln)                     |
 | GET   | `/t/{tag}`            | HTML-lista filtrerad på en tvättad tagg           |
+| GET   | `/a`                  | HTML: skribentöversikt (sökbar lista)             |
 | GET   | `/a/{author}`         | HTML-lista filtrerad på skribent                  |
 | GET   | `/tags`               | HTML: bygg en feed på flera taggar                |
 | GET   | `/search`             | HTML: FTS5-sök på titel/ingress/taggar (`?q=`)    |

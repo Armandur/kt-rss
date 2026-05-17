@@ -76,7 +76,8 @@ timeout + få retries, endast GET. Se `api_client.py` och spec §3.
 ## URL-schema
 
 `/` index, `/articles` + `/s/{section}` + `/t/{tag}` + `/a/{author}`
-HTML-listor, `/t` taggöversikt, `/tags` bygg-en-feed-vy, `/search`
+HTML-listor, `/t` taggöversikt, `/a` skribentöversikt, `/tags`
+bygg-en-feed-vy, `/search`
 artikelsök, `/feed.xml` + `/feed/{section}.xml` + `/feed/t/{tag}.xml` +
 `/feed/a/{author}.xml` + `/feed/tags.xml` (flera taggar,
 `?t=a,b&mode=or/and`) Atom (`?fmt=rss` ger RSS). `/feeds.opml` listar

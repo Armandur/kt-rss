@@ -399,7 +399,8 @@ code {
 }
 
 /* --- Tagg-översikt / taggmoln (/t) --- */
-.tag-search {
+.tag-search,
+.author-search {
   font: inherit;
   width: 100%;
   max-width: 22rem;
@@ -433,6 +434,31 @@ code {
 .lvl-2 { font-size: 1.1rem; }
 .lvl-3 { font-size: 1.4rem; }
 .lvl-4 { font-size: 1.8rem; }
+
+/* --- Skribentöversikt (/a) --- */
+.author-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2.5rem;
+  columns: 2;
+  column-gap: 2rem;
+}
+.author-list li {
+  break-inside: avoid;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+.author-list a {
+  text-decoration: none;
+  color: var(--accent);
+}
+.author-list a:hover { text-decoration: underline; }
+.author-count {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
 
 /* --- Tagg-feed-byggare (/tags) --- */
 .feedbuilder { margin: 0.5rem 0 1.4rem; }
@@ -572,4 +598,5 @@ code {
   }
 
   .section-links { columns: 1; }
+  .author-list { columns: 1; }
 }

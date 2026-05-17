@@ -48,6 +48,9 @@ def test_route_author(db_path, settings, raw_articles):
         feed = client.get("/feed/a/Anna%20Andersson.xml")
         assert feed.status_code == 200
         assert "atom" in feed.headers["content-type"]
+        # Skribentöversikten listar författaren.
+        index = client.get("/a")
+        assert index.status_code == 200 and "Anna Andersson" in index.text
         # Okänd skribent -> 404 i båda vyerna.
         assert client.get("/a/Ingen%20Alls").status_code == 404
         assert client.get("/feed/a/Ingen%20Alls.xml").status_code == 404

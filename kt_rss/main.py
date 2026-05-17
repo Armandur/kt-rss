@@ -422,6 +422,16 @@ def articles_tag(
     )
 
 
+@app.get("/a", response_class=HTMLResponse)
+def author_index(request: Request, conn_settings=Depends(get_conn_settings)):
+    conn, settings = conn_settings
+    return templates.TemplateResponse(
+        request,
+        "author_index.html",
+        {"authors": list_authors(conn), "state": get_fetch_state(conn)},
+    )
+
+
 @app.get("/a/{author}", response_class=HTMLResponse)
 def articles_author(
     author: str,

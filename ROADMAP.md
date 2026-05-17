@@ -65,8 +65,9 @@ i artikellistan.
 - **OPML-export.** `/feeds.opml` listar alla sektionsfeeds (absoluta URL:er)
   för import i en RSS-läsare i ett svep.
 - **Författarvyer.** `/a/{author}` HTML-lista och `/feed/a/{author}.xml`,
-  analogt med sektionsvyerna (exakt match på `author`). Författarnamnet i
-  varje artikel är en länk dit.
+  analogt med sektionsvyerna (exakt match på `author`). Skribentöversikten
+  `/a` är en sökbar lista att bläddra från, och författarnamnet i varje
+  artikel är en länk till skribentens vy.
 
 ### Idéer (ej påbörjat)
 

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}KT-RSS | Skribenter{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="/">Start</a><span>/</span><span class="here">Skribenter</span>
+</nav>
+
+<header class="list-header">
+  <h1>Skribenter</h1>
+</header>
+
+<p class="lead">
+  Alla skribenter i arkivet. Klicka på ett namn för att läsa deras
+  artiklar eller prenumerera på en feed.
+</p>
+
+{% if not authors %}
+<p class="empty">Inga skribenter än. Listan fylls vid nästa poll.</p>
+{% else %}
+<input type="search" class="author-search"
+       placeholder="Sök skribent&hellip;" autocomplete="off">
+<ul class="author-list">
+  {% for a in authors %}
+  <li data-name="{{ a.author }}">
+    <a href="/a/{{ a.author|urlencode }}">{{ a.author }}</a>
+    <span class="author-count">{{ a.count }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/authors.js" defer></script>
+{% endblock %}
