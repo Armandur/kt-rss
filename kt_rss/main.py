@@ -41,7 +41,12 @@ from kt_rss.db import (
     list_tags,
     search_articles,
 )
-from kt_rss.db import STATUS_OK, STATUS_SKIPPED_304
+from kt_rss.db import (
+    STATUS_ERROR,
+    STATUS_OK,
+    STATUS_SANITY_FAILED,
+    STATUS_SKIPPED_304,
+)
 from kt_rss.feed import build_feed, build_image_url, build_opml
 from kt_rss.scheduler import create_scheduler
 
@@ -80,6 +85,16 @@ def _sv_datetime(iso: str | None) -> str:
     """ISO 8601 -> '16 maj 2026, 17:39' i svensk tid."""
     d = _to_sv(iso)
     return f"{d.day} {SV_MONTHS[d.month]} {d.year}, {d:%H:%M}" if d else ""
+
+
+def _human_size(num: int) -> str:
+    """Antal bytes -> kort läsbar storlek (B/KB/MB)."""
+    size = float(num)
+    for unit in ("B", "KB"):
+        if size < 1024:
+            return f"{size:.0f} {unit}"
+        size /= 1024
+    return f"{size:.1f} MB"
 
 
 templates.env.filters["sv_date"] = _sv_date
@@ -610,6 +625,57 @@ def search(
 # --------------------------------------------------------------------------
 # Health
 # --------------------------------------------------------------------------
+
+STATUS_LABELS = {
+    STATUS_OK: "OK",
+    STATUS_SKIPPED_304: "Inget nytt (304)",
+    STATUS_ERROR: "Fel vid hämtning",
+    STATUS_SANITY_FAILED: "Sanity-koll slog till",
+}
+
+
+@app.get("/status", response_class=HTMLResponse)
+def status_page(request: Request, conn_settings=Depends(get_conn_settings)):
+    conn, settings = conn_settings
+    state = get_fetch_state(conn)
+    tags = list_tags(conn)
+    editorial, debate = list_authors_split(conn, DEBATE_SECTIONS)
+    months = list_archive_months(conn)
+    db_file = Path(settings.db_path)
+    db_bytes = sum(
+        p.stat().st_size
+        for p in (db_file, db_file.with_name(db_file.name + "-wal"))
+        if p.exists()
+    )
+    last_run = state["last_run_at"] if state else None
+    last_status = state["last_status"] if state else None
+
+    def _period(row) -> str:
+        return f"{SV_MONTHS[int(row['month'])]} {row['year']}"
+
+    return templates.TemplateResponse(
+        request,
+        "status.html",
+        {
+            "state": state,
+            "article_count": count_articles(conn),
+            "remote_count": state["total_count"] if state else 0,
+            "last_poll": _sv_datetime(last_run) if last_run else None,
+            "last_status": STATUS_LABELS.get(last_status, last_status or "-"),
+            "last_count": state["last_count"] if state else 0,
+            "poll_minutes": settings.poll_minutes,
+            "sections": list_sections(conn),
+            "tag_count": len(tags),
+            "top_tags": sorted(tags, key=lambda t: (-t[1], t[0]))[:15],
+            "editorial_count": len(editorial),
+            "debate_count": len(debate),
+            "month_count": len(months),
+            "newest_period": _period(months[0]) if months else None,
+            "oldest_period": _period(months[-1]) if months else None,
+            "db_size": _human_size(db_bytes),
+        },
+    )
+
 
 @app.get("/healthz")
 def healthz(conn_settings=Depends(get_conn_settings)) -> JSONResponse:

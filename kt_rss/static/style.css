@@ -85,7 +85,9 @@ code {
   margin: 0;
   font-size: 0.84rem;
   color: var(--ink-soft);
+  text-decoration: none;
 }
+.poll-status:hover { color: var(--accent); }
 .poll-status strong { text-transform: capitalize; }
 
 .theme-toggle {
@@ -435,11 +437,13 @@ code {
 .lvl-3 { font-size: 1.4rem; }
 .lvl-4 { font-size: 1.8rem; }
 
-/* --- Skribent- (/a) och arkivöversikt (/archive) --- */
+/* --- Skribent- (/a), arkiv- (/archive) och statusöversikt (/status) --- */
 .author-group,
-.archive-year { margin-bottom: 2rem; }
+.archive-year,
+.status-block { margin-bottom: 2rem; }
 .author-group h2,
-.archive-year h2 {
+.archive-year h2,
+.status-block h2 {
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--ink-soft);
@@ -478,6 +482,20 @@ code {
   font-size: 0.8rem;
   color: var(--ink-soft);
 }
+
+.status-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1.5rem;
+  margin: 0;
+}
+.status-grid dt { color: var(--ink-soft); }
+.status-grid dd { margin: 0; }
+.status-table { border-collapse: collapse; }
+.status-table td { padding: 0.2rem 1.5rem 0.2rem 0; }
+.status-table td:last-child { color: var(--ink-soft); text-align: right; }
+.status-table a { text-decoration: none; }
+.status-table a:hover { text-decoration: underline; }
 
 /* --- Tagg-feed-byggare (/tags) --- */
 .feedbuilder { margin: 0.5rem 0 1.4rem; }

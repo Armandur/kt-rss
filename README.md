@@ -24,6 +24,7 @@ aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/archive/{år}/{månad}` | Stylead HTML-lista per publiceringsmånad |
 | `/tags` | Bygg en feed på flera taggar (sök + kryssrutor) |
 | `/search` | Sök artiklar på rubrik och ingress (`?q=`) |
+| `/status` | Status- och statistiksida (pollning, antal, DB-storlek) |
 | `/feed.xml` | Atom, alla sektioner (`?fmt=rss` ger RSS 2.0) |
 | `/feed/{section}.xml` | Atom per sektion (`?fmt=rss` ger RSS 2.0) |
 | `/feed/t/{tag}.xml` | Atom per tagg (`?fmt=rss` ger RSS 2.0) |

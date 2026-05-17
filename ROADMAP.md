@@ -55,9 +55,7 @@ i artikellistan.
   ingress, taggar och författare. (Infinite scroll på resultaten kvarstår
   som möjlig påbyggnad.)
 
-## v5
-
-### Klart
+## v5 (klar)
 
 - **Feed-autodiscovery.** `<link rel="alternate" type="application/atom+xml">`
   i `<head>` på HTML-vyerna - RSS-läsare hittar rätt feed automatiskt när
@@ -79,13 +77,9 @@ i artikellistan.
 - **Datumarkiv.** `/archive` listar publiceringsmånader grupperade per år;
   `/archive/{år}/{månad}` är en artikellista för månaden med samma infinite
   scroll som övriga listvyer. Filtrerar på `published_at`-prefix.
-
-### Idéer (ej påbörjat)
-
-Prioordning enligt nedan.
-
-1. **Status- och statistiksida.** En HTML-vy med pollhistorik, artikelantal
-   per sektion/tagg och DB-storlek - insyn utöver `/healthz`.
+- **Status- och statistiksida.** `/status` - en HTML-vy med pollningstillstånd,
+  artikelantal totalt och per sektion, vanligaste taggar, skribent- och
+  periodspann samt databasstorlek. Headerns poll-status länkar dit.
 
 ## Längre fram (ej versionsbundet)
 

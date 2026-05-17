@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}KT-RSS | Status{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="/">Start</a><span>/</span><span class="here">Status</span>
+</nav>
+
+<header class="list-header">
+  <h1>Status</h1>
+</header>
+
+<section class="status-block">
+  <h2>Pollning</h2>
+  <dl class="status-grid">
+    <dt>Senaste poll</dt><dd>{{ last_poll or "-" }}</dd>
+    <dt>Resultat</dt><dd>{{ last_status }}</dd>
+    <dt>Hämtade senast</dt><dd>{{ last_count }} artiklar</dd>
+    <dt>Pollintervall</dt><dd>var {{ poll_minutes }}:e minut</dd>
+  </dl>
+</section>
+
+<section class="status-block">
+  <h2>Innehåll</h2>
+  <dl class="status-grid">
+    <dt>Artiklar i arkivet</dt><dd>{{ article_count }}</dd>
+    <dt>Hos KT totalt</dt><dd>{{ remote_count }}</dd>
+    <dt>Period</dt>
+    <dd>
+      {% if oldest_period %}
+        {{ oldest_period }} - {{ newest_period }} ({{ month_count }} månader)
+      {% else %}-{% endif %}
+    </dd>
+    <dt>Sektioner</dt><dd>{{ sections|length }}</dd>
+    <dt>Taggar</dt><dd>{{ tag_count }}</dd>
+    <dt>Skribenter</dt>
+    <dd>{{ editorial_count }} redaktionella, {{ debate_count }} debatt/övriga</dd>
+    <dt>Databasstorlek</dt><dd>{{ db_size }}</dd>
+  </dl>
+</section>
+
+<section class="status-block">
+  <h2>Artiklar per sektion</h2>
+  <table class="status-table">
+    <tbody>
+      {% for s in sections %}
+      <tr>
+        <td><a href="/s/{{ s.section|urlencode }}">{{ s.section }}</a></td>
+        <td>{{ s.count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="status-block">
+  <h2>Vanligaste taggar</h2>
+  <table class="status-table">
+    <tbody>
+      {% for tag, count in top_tags %}
+      <tr>
+        <td><a href="/t/{{ tag|urlencode }}">{{ tag }}</a></td>
+        <td>{{ count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

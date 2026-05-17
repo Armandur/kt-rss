@@ -353,6 +353,7 @@ som hindrar omkörning vid varje omstart; ta bort den för att köra om.
 | GET   | `/archive/{år}/{mån}` | HTML-lista filtrerad på publiceringsmånad         |
 | GET   | `/tags`               | HTML: bygg en feed på flera taggar                |
 | GET   | `/search`             | HTML: FTS5-sök på titel/ingress/taggar (`?q=`)    |
+| GET   | `/status`             | HTML: pollningstillstånd och arkivstatistik       |
 
 - Atom (RSS 2.0 via `?fmt=rss`). `Content-Type:
   application/atom+xml; charset=utf-8`.
