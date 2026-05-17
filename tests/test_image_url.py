@@ -26,7 +26,9 @@ def test_build_image_url_format():
 
 
 def test_build_image_url_med_storlek():
-    # webui-thumbnails skickar width/height; feed-enclosure utelämnar dem.
+    # width skalar proportionerligt; width+height tvingar exakta mått.
+    # Utan storleksparameter svarar API:t bara med en 100x56-rendition.
     url = build_image_url("5", width=480, height=312)
     assert "width=480" in url and "height=312" in url
+    assert "width=1200" in build_image_url("5", width=1200)
     assert "width=" not in build_image_url("5")

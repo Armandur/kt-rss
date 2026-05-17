@@ -27,9 +27,10 @@ def build_image_url(
     """Bygger en bild-URL mot KT:s bild-API (spec SS2.2).
 
     Crop låses till full bild (0/0/100/100) - feeden och webui vill ha hela
-    motivet, inte en panorama-crop. `width`/`height` ger en nedskalad
-    rendition (KT:s egen listvy använder 240x156); utan dem svarar API:t med
-    en standardstorlek. Verifierat 200 + image/webp i bootstrap
+    motivet, inte en panorama-crop. `width` ensam skalar proportionerligt;
+    `width`+`height` tvingar exakta mått och kan beskära. Utan någondera
+    svarar API:t bara med en pytteliten standardrendition (100x56) - ange
+    därför alltid minst `width`. Verifierat i bootstrap
     (tests/fixtures/image-api-findings.md).
     """
     iid = str(image_id).strip()
@@ -158,7 +159,7 @@ def build_feed(
         # _fix_atom_enclosure_links).
         if settings.include_image_enclosure and a["image_id"]:
             fe.link(
-                href=build_image_url(a["image_id"]),
+                href=build_image_url(a["image_id"], width=1200),
                 rel="enclosure",
                 type="image/webp",
                 length="0",

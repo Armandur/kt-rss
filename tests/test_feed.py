@@ -89,6 +89,8 @@ def test_atom_enclosure_pa_artikel_med_bild(settings, db_path, raw_articles):
         assert enc is not None
         assert enc.get("type") == "image/webp"
         assert enc.get("href").startswith("https://image.kyrkanstidning.se/")
+        # Feed-bilden skalas upp - utan width svarar API:t med 100x56.
+        assert "width=1200" in enc.get("href")
 
 
 def test_rss_enclosure_pa_artikel_med_bild(settings, db_path, raw_articles):
