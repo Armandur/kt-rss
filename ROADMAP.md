@@ -41,7 +41,7 @@ i artikellistan.
 - **Artikelsök.** `/search?q=` söker artiklar på titel och ingress
   (`instr`-substräng, versal-okänsligt). Sökruta i startsidans hero.
 
-## v4
+## v4 (klar)
 
 - **Mörkt/ljust tema.** Mörk palett som följer OS via `prefers-color-scheme`,
   med en manuell växlingsknapp i headern. Valet sparas i localStorage och
@@ -63,6 +63,10 @@ i artikellistan.
   Förutsätter HTTPS.
 - **Conditional requests.** API:et skickar i dag inga `ETag`/`Last-Modified`.
   304-grenen i pollern finns kvar defensivt om det ändras.
+- **FTS-rebuild bara vid behov.** `init_db` bygger om hela FTS-indexet vid
+  varje start (~0,4 s per 10 000 artiklar, linjärt). Vid stora arkiv blir
+  det en märkbar appstart-fördröjning - bygg om bara när indexet saknas
+  eller har drivit i stället.
 
 ## Utanför scope
 
