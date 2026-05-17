@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 {% block title %}KT-RSS | {{ title }}{% endblock %}
 
+{% macro monthnav() %}
+{% if older or newer %}
+<nav class="month-nav">
+  {% if older %}
+  <a class="month-prev" href="{{ older.url }}">&larr; {{ older.label }}</a>
+  {% endif %}
+  {% if newer %}
+  <a class="month-next" href="{{ newer.url }}">{{ newer.label }} &rarr;</a>
+  {% endif %}
+</nav>
+{% endif %}
+{% endmacro %}
+
 {% block content %}
 <nav class="crumbs">
   <a href="/">Start</a><span>/</span><span class="here">{{ title }}</span>
@@ -17,6 +30,8 @@
 <p class="empty">Inga artiklar än. Listan fylls vid nästa poll.</p>
 {% endif %}
 
+{{ monthnav() }}
+
 <div class="articles">
   {% include "_articles.html" %}
 </div>
@@ -27,6 +42,8 @@
      data-next-page="{{ pagination.next_page }}"
      data-total-pages="{{ pagination.total_pages }}"></div>
 {% endif %}
+
+{{ monthnav() }}
 {% endblock %}
 
 {% block scripts %}

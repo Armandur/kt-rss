@@ -422,6 +422,20 @@ code {
   border-bottom: 2px solid var(--line);
 }
 
+/* Bläddra till grannmånad i datumarkivet (list.html monthnav). */
+.month-nav {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0 1.4rem;
+}
+.month-nav a {
+  text-decoration: none;
+  color: var(--accent);
+  font-weight: 600;
+}
+.month-nav a:hover { text-decoration: underline; }
+.month-next { margin-left: auto; }
+
 .article {
   display: flex;
   gap: 1.2rem;

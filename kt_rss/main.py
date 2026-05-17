@@ -572,11 +572,9 @@ def archive_month(
 ):
     conn, settings = conn_settings
     period = f"{year:04d}-{month:02d}"
-    counts = {
-        f"{r['year']}-{r['month']}": r["count"]
-        for r in list_archive_months(conn)
-    }
-    if period not in counts:
+    months = list_archive_months(conn)
+    keys = [f"{r['year']}-{r['month']}" for r in months]
+    if period not in keys:
         return templates.TemplateResponse(
             request,
             "notfound.html",
@@ -585,7 +583,8 @@ def archive_month(
             status_code=404,
         )
     pg = _paginate(
-        f"/archive/{year}/{month}", page, counts[period], settings.page_size
+        f"/archive/{year}/{month}", page,
+        months[keys.index(period)]["count"], settings.page_size,
     )
     articles = get_articles(
         conn, period=period, limit=settings.page_size, offset=pg["offset"]
@@ -594,6 +593,16 @@ def archive_month(
         return templates.TemplateResponse(
             request, "_articles.html", {"articles": articles}
         )
+
+    # Grannmånader för bläddringslänkarna - months är nyaste först.
+    def _navinfo(row) -> dict:
+        y, m = row["year"], int(row["month"])
+        return {"url": f"/archive/{y}/{m}",
+                "label": f"{SV_MONTHS[m].capitalize()} {y}"}
+
+    idx = keys.index(period)
+    newer = _navinfo(months[idx - 1]) if idx > 0 else None
+    older = _navinfo(months[idx + 1]) if idx + 1 < len(months) else None
     return templates.TemplateResponse(
         request,
         "list.html",
@@ -604,6 +613,8 @@ def archive_month(
             "feed_path": None,
             "state": get_fetch_state(conn),
             "pagination": pg,
+            "older": older,
+            "newer": newer,
         },
     )
 

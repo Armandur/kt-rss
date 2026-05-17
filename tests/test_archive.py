@@ -58,3 +58,35 @@ def test_route_archive(db_path, settings, raw_articles):
         assert client.get("/archive/2020/1").status_code == 404
     finally:
         app.dependency_overrides.clear()
+
+
+def test_month_navigation(db_path, settings, raw_articles):
+    base = map_article(raw_articles[0], BASE)
+    conn = connect(db_path)
+    upsert_article(conn, replace(base, id="a", published_at="2026-03-10T08:00:00+02:00"))
+    upsert_article(conn, replace(base, id="b", published_at="2026-04-10T08:00:00+02:00"))
+    upsert_article(conn, replace(base, id="c", published_at="2026-05-10T08:00:00+02:00"))
+    conn.commit()
+    conn.close()
+
+    def _override():
+        c = connect(db_path)
+        try:
+            yield c, settings
+        finally:
+            c.close()
+
+    app.dependency_overrides[get_conn_settings] = _override
+    try:
+        client = TestClient(app)
+        # Mittenmånaden länkar till både föregående och nästa.
+        mid = client.get("/archive/2026/4").text
+        assert "/archive/2026/3" in mid and "/archive/2026/5" in mid
+        # Äldsta månaden: bara nästa-länk.
+        oldest = client.get("/archive/2026/3").text
+        assert "/archive/2026/4" in oldest and "/archive/2026/2" not in oldest
+        # Nyaste månaden: bara föregående-länk.
+        newest = client.get("/archive/2026/5").text
+        assert "/archive/2026/4" in newest and "/archive/2026/6" not in newest
+    finally:
+        app.dependency_overrides.clear()
