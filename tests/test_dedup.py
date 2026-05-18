@@ -1,11 +1,31 @@
 """Dedup-logik: first_seen rörs inte, last_seen + ändrade fält uppdateras (SS6, SS8:7)."""
 
+import threading
 from dataclasses import replace
 
 import kt_rss.db as db
 from kt_rss.db import connect, map_article, upsert_article
 
 BASE = "https://www.kyrkanstidning.se"
+
+
+def test_connect_far_anvandas_cross_thread(db_path):
+    # FastAPI stänger get_conn_settings-anslutningen i en annan tråd än den
+    # skapades i; check_same_thread=False ska göra det ofarligt.
+    conn = connect(db_path)
+    fel: list[Exception] = []
+
+    def stang():
+        try:
+            conn.execute("SELECT 1").fetchone()
+            conn.close()
+        except Exception as exc:  # noqa: BLE001
+            fel.append(exc)
+
+    t = threading.Thread(target=stang)
+    t.start()
+    t.join()
+    assert not fel, f"cross-thread-användning kastade: {fel}"
 
 
 def test_samma_id_ger_ett_item(db_path, raw_articles):
