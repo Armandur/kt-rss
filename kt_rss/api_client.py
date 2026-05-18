@@ -69,6 +69,11 @@ def fetch_articles(
 ) -> FetchResult:
     """Hämtar en sida artiklar. Kastar aldrig - returnerar alltid ett FetchResult."""
     params = build_params(limit, start)
+    # Cache-buster: KT:s API ligger bakom CloudFront + Varnish och kan
+    # annars svara med timmar gamla cachade resultat (osynkade edge-noder).
+    # En unik parameter per anrop ger en unik URL -> cache-miss -> färskt
+    # svar från origin. Bryt inte ut den - utan den missar pollern artiklar.
+    params["_"] = str(time.time_ns())
     headers = dict(settings.request_headers)
     # Conditional requests: API:et skickar inte ETag/Last-Modified i dag
     # (se config.CONDITIONAL_REQUEST_SUPPORT), men skicka validatorer om

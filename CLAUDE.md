@@ -30,7 +30,7 @@ Ingen HTML-parser, ingen bundler, inga webbteckensnitt.
 ```
 kt_rss/
   config.py       pydantic-settings + statiska API-konstanter + BOOTSTRAP-FYND
-  api_client.py   httpx-GET: query-bygge, headers/UA, retry/backoff
+  api_client.py   httpx-GET: query-bygge, cache-buster, headers/UA, retry/backoff
   inspect.py      engångs bootstrap-utredning mot live-API (spec §10)
   db.py           SQLite-schema, mapping (map_article), dedup (upsert_article)
   poller.py       en pollningsrunda: sanity, filtrering, upsert
