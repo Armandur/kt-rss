@@ -777,6 +777,11 @@ def status_page(request: Request, conn_settings=Depends(get_conn_settings)):
         for r in chart_months
     ]
 
+    scheduler = getattr(request.app.state, "scheduler", None)
+    job = scheduler.get_job("poll") if scheduler else None
+    next_run = job.next_run_time if job else None
+    next_poll = _sv_datetime(next_run.isoformat()) if next_run else None
+
     return templates.TemplateResponse(
         request,
         "status.html",
@@ -785,6 +790,7 @@ def status_page(request: Request, conn_settings=Depends(get_conn_settings)):
             "article_count": count_articles(conn),
             "remote_count": state["total_count"] if state else 0,
             "last_poll": _sv_datetime(last_run) if last_run else None,
+            "next_poll": next_poll,
             "last_status": STATUS_LABELS.get(last_status, last_status or "-"),
             "last_count": state["last_count"] if state else 0,
             "poll_minutes": settings.poll_minutes,

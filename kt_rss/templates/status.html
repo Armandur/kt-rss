@@ -22,6 +22,7 @@
   <h2>Pollning</h2>
   <dl class="status-grid">
     <dt>Senaste poll</dt><dd>{{ last_poll or "-" }}</dd>
+    <dt>Nästa poll</dt><dd>{{ next_poll or "-" }}</dd>
     <dt>Resultat</dt><dd>{{ last_status }}</dd>
     <dt>Hämtade senast</dt><dd>{{ last_count }} artiklar</dd>
     <dt>Pollintervall</dt><dd>var {{ poll_minutes }}:e minut</dd>
