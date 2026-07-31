@@ -178,7 +178,8 @@ def init_db(db_path: str) -> None:
                 last_run_at   TEXT,
                 last_count    INTEGER NOT NULL DEFAULT 0,
                 last_status   TEXT,
-                total_count   INTEGER NOT NULL DEFAULT 0
+                total_count   INTEGER NOT NULL DEFAULT 0,
+                alert_active  INTEGER NOT NULL DEFAULT 0
             );
 
             INSERT OR IGNORE INTO fetch_state (key) VALUES ('default');
@@ -202,6 +203,14 @@ def init_db(db_path: str) -> None:
         if "image_id" not in cols:
             conn.execute(
                 "ALTER TABLE articles ADD COLUMN image_id TEXT NOT NULL DEFAULT ''"
+            )
+        state_cols = {
+            r["name"] for r in conn.execute("PRAGMA table_info(fetch_state)")
+        }
+        if "alert_active" not in state_cols:
+            conn.execute(
+                "ALTER TABLE fetch_state ADD COLUMN alert_active "
+                "INTEGER NOT NULL DEFAULT 0"
             )
 
         # Engångs-omtvätt av äldre author-värden. byline_names lagrades förr
@@ -366,6 +375,31 @@ def log_poll(
         "INSERT INTO poll_log (run_at, status, fetched, inserted, updated) "
         "VALUES (?, ?, ?, ?, ?)",
         (now_utc(), status, fetched, inserted, updated),
+    )
+    conn.commit()
+
+
+def consecutive_failures(conn: sqlite3.Connection, limit: int = 20) -> int:
+    """Antal misslyckade pollrundor i rad, räknat från den senaste.
+
+    304 räknas som lyckad, precis som i /healthz - annars skulle "frisk"
+    betyda olika saker på statussidan och i notifieringen.
+    """
+    count = 0
+    for row in conn.execute(
+        "SELECT status FROM poll_log ORDER BY id DESC LIMIT ?", (limit,)
+    ):
+        if row["status"] in (STATUS_OK, STATUS_SKIPPED_304):
+            break
+        count += 1
+    return count
+
+
+def set_alert_active(conn: sqlite3.Connection, active: bool) -> None:
+    """Markerar om en felnotis är utskickad och ännu inte återställd."""
+    conn.execute(
+        "UPDATE fetch_state SET alert_active = ? WHERE key = 'default'",
+        (1 if active else 0,),
     )
     conn.commit()
 

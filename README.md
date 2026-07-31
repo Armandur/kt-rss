@@ -103,6 +103,31 @@ Se [`.env.example`](.env.example) för fullständig lista. De viktigaste:
 | `KT_RSS_SECTION_ALLOWLIST` | (tom = alla) | Komma-separerade `section_tag` |
 | `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` | `true` | Artikelbild som enclosure i feeds |
 | `KT_RSS_BACKFILL_PAGES` | `0` | Backfill vid start: sidor à 100 artiklar (0 = av, -1 = hela arkivet) |
+| `KT_RSS_NTFY_TOPIC` | (tom = notiser av) | ntfy-topic, i drift `svc_kt_rss` |
+| `KT_RSS_NTFY_TOKEN` | (tom = notiser av) | Per-tjänst-token, sätts bara i driftmiljön |
+| `KT_RSS_NTFY_URL` | `https://ntfy.pettersson-vik.se` | ntfy-instans |
+| `KT_RSS_NOTIFY_AFTER_FAILURES` | `3` | Misslyckade pollningar i rad innan notis |
+
+## Notiser
+
+Skriver till topicet `svc_kt_rss` på den privata ntfy-instansen. Saknas
+topic eller token är notifieringen helt av (så lokal utveckling är tyst).
+
+Två notiser finns, båda på **tillståndsövergång** och aldrig per poll:
+
+| Händelse | Prio | Utlöses av |
+|----------|------|-----------|
+| Pollningen har fastnat | 3 (titta idag) | `KT_RSS_NOTIFY_AFTER_FAILURES` rundor i rad med `error` eller `sanity_failed` |
+| Pollningen fungerar igen | 2 | Första lyckade rundan efter en utskickad felnotis |
+
+Tröskeln filtrerar bort enstaka blippar, och `alert_active` i `fetch_state`
+gör att en fortsatt trasig tjänst bara larmar en gång. Notisen länkar till
+`/status` via `X-Click`.
+
+**Detta täcker inte att tjänsten dör.** Stannar containern slutar
+schemaläggaren köra och ingen kod här kan larma - tystnad läses som
+framgång. Det kräver en extern heartbeat-vakt (infra TASK-653), som ännu
+inte finns.
 
 ## Hövlighet mot KT:s API
 

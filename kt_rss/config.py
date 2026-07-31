@@ -47,6 +47,13 @@ class Settings(BaseSettings):
     backfill_pages: int = 0
     log_level: str = "INFO"
 
+    # Notifiering via privat ntfy (infra-policy, avsnitt 3.2 och 6).
+    # Tom topic eller token = notifiering av.
+    ntfy_url: str = "https://ntfy.pettersson-vik.se"
+    ntfy_topic: str = ""
+    ntfy_token: str = ""
+    notify_after_failures: int = 3
+
     @field_validator("poll_minutes")
     @classmethod
     def _enforce_min_poll(cls, v: int) -> int:
@@ -54,7 +61,12 @@ class Settings(BaseSettings):
         # hindra start, men intervallet får aldrig understiga minimivärdet.
         return max(MIN_POLL_MINUTES, v)
 
-    @field_validator("public_url", "base_url", "api_url")
+    @field_validator("notify_after_failures")
+    @classmethod
+    def _at_least_one_failure(cls, v: int) -> int:
+        return max(1, v)
+
+    @field_validator("public_url", "base_url", "api_url", "ntfy_url")
     @classmethod
     def _strip_trailing_slash(cls, v: str) -> str:
         return v.rstrip("/") if v != v.rstrip("/") and v.count("/") > 2 else v
@@ -75,6 +87,11 @@ class Settings(BaseSettings):
             "Referer": "https://www.kyrkanstidning.se/",
             "Origin": "https://www.kyrkanstidning.se",
         }
+
+    @property
+    def notify_enabled(self) -> bool:
+        """Notifiering kräver både topic och token - annars tyst av."""
+        return bool(self.ntfy_topic and self.ntfy_token and self.ntfy_url)
 
     @property
     def allowed_sections(self) -> set[str]:

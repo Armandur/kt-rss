@@ -34,6 +34,7 @@ kt_rss/
   inspect.py      engångs bootstrap-utredning mot live-API (spec §10)
   db.py           SQLite-schema, mapping (map_article), dedup (upsert_article)
   poller.py       en pollningsrunda: sanity, filtrering, upsert
+  notify.py       ntfy-felnotis på tillståndsövergång (ok<->fel)
   scheduler.py    APScheduler - periodisk poll + uppstartspoll
   feed.py         feedgen: Atom/RSS-serialisering
   backfill.py     manuell CLI-backfill + uppstarts-backfill (spec §8.1)
@@ -60,7 +61,8 @@ som faktiskt ändras.
 - `articles` - en rad per artikel. PK `id` (API:ets id som text). `bodytext`
   finns medvetet INTE (innehållspolicy, se nedan).
 - `fetch_state` - en rad (`key='default'`): pollningstillstånd, `last_status`,
-  `total_count` m.m.
+  `total_count`, `alert_active` (om en felnotis är skickad och inte återställd)
+  m.m.
 - `poll_log` - en rad per pollrunda (tid, status, antal hämtade/nya/
   uppdaterade). `poll_once` skriver, `/status` visar pollhistoriken.
 - `articles_fts` - FTS5-fulltextindex (external content mot `articles`,
@@ -116,6 +118,8 @@ som section-värden).
 
 - Ny feed-egenskap: `feed.py` (`build_feed`).
 - Ändrad pollningslogik/sanity: `poller.py`.
+- Notiser (ntfy): `notify.py`. Bara tillståndsövergång, aldrig per poll -
+  se `~/workspace/infra/docs/ntfy-notifieringspolicy.md`.
 - Nya/ändrade fält: `db.py` (`Article`, `map_article`, schema i `init_db()`).
 - UI: `templates/` + `static/style.css`.
 - Ny env-variabel: `config.py` (`Settings`) + `.env.example` + README-tabell.

@@ -24,6 +24,7 @@ from kt_rss.db import (
     touch_run,
     upsert_article,
 )
+from kt_rss.notify import handle_poll_status
 
 logger = logging.getLogger("kt_rss.poller")
 
@@ -70,6 +71,10 @@ def poll_once(settings: Settings) -> dict:
             conn.close()
     except Exception:
         logger.exception("kunde inte skriva poll_log")
+
+    # Felnotis på tillståndsövergång. Egen felhantering i handle_poll_status
+    # - en trasig notifieringskanal får inte påverka pollresultatet.
+    handle_poll_status(settings, summary.get("status", STATUS_ERROR))
 
     return summary
 
