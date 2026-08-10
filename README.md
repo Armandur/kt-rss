@@ -37,6 +37,7 @@ Brödtext återpubliceras aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/feed/tags.xml` | Atom på flera taggar (`?t=a,b&mode=or/and`) |
 | `/feed/search.xml` | Atom på en sökterm (`?q=`) |
 | `/feeds.opml` | OPML med alla sektionsfeeds (importeras i en RSS-läsare) |
+| `/images/{image_id}/{thumb,feed}.webp` | Lokalt cachade artikelbilder |
 | `/healthz` | JSON-status: antal artiklar, senaste poll m.m. |
 
 Sektioner härleds från datan (`section_tag`) - inget hårdkodas.
@@ -56,6 +57,10 @@ uv run uvicorn kt_rss.main:app --reload
 
 Appen pollar API:et kort efter start och sedan var `KT_RSS_POLL_MINUTES`:e
 minut. Öppna http://localhost:8000.
+
+Artikel- och bildanrop delar en Wicketkeeper-verifierad cookie-session. Bilder
+hämtas seriellt med minst tre sekunders intervall, sparas under databaskatalogens
+`images/` och serveras från kt-rss egen origin.
 
 Tester (offline, mot sparade fixtures - inget nät krävs):
 
@@ -138,6 +143,8 @@ Detta är icke-förhandlingsbart - bygg inte bort det:
   hämtas aldrig automatiskt.
 - Ärlig, identifierande User-Agent (`kt-rss-bridge/<version>`).
 - Kort timeout, få retries med exponentiell backoff, endast `GET`.
+- Bildcache med samtidighet 1, minst tre sekunder mellan externa bildanrop och
+  sex timmars cooldown efter fel.
 
 ## Manuell backfill
 

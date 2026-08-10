@@ -11,6 +11,7 @@ import logging
 
 from kt_rss.api_client import fetch_articles
 from kt_rss.config import FIRST_PAGE_START, Settings
+from kt_rss.image_cache import enqueue_images
 from kt_rss.db import (
     STATUS_ERROR,
     STATUS_OK,
@@ -164,6 +165,10 @@ def _do_poll(settings: Settings) -> dict:
             "skip %d), totalCount=%d",
             len(articles_raw), len(kept), counts["inserted"], counts["updated"],
             counts["unchanged"], counts["skipped"], total_count,
+        )
+        enqueue_images(
+            settings,
+            [str(raw.get("image")) for raw in kept if raw.get("image")],
         )
         return {
             "status": STATUS_OK,

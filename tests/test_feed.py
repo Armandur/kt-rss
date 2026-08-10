@@ -1,6 +1,7 @@
 """Feed-serialisering: valid Atom/RSS, ALDRIG bodytext (spec SS7, SS9)."""
 
 import xml.etree.ElementTree as ET
+from pathlib import Path
 from dataclasses import replace
 
 from kt_rss.db import connect, get_articles, map_article, upsert_article
@@ -16,6 +17,11 @@ def _seed(db_path, raw_articles):
     conn.commit()
     rows = get_articles(conn, limit=100)
     conn.close()
+    for row in rows:
+        if row["image_id"]:
+            path = Path(db_path).parent / "images" / row["image_id"] / "feed.webp"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"cached-webp")
     return rows
 
 
@@ -113,9 +119,8 @@ def test_atom_enclosure_pa_artikel_med_bild(settings, db_path, raw_articles):
         enc = entry.find(f"{ATOM_NS}link[@rel='enclosure']")
         assert enc is not None
         assert enc.get("type") == "image/webp"
-        assert enc.get("href").startswith("https://image.kyrkanstidning.se/")
-        # Feed-bilden skalas upp - utan width svarar API:t med 100x56.
-        assert "width=1200" in enc.get("href")
+        assert enc.get("href").startswith("http://localhost:8000/images/")
+        assert enc.get("href").endswith("/feed.webp")
 
 
 def test_rss_enclosure_pa_artikel_med_bild(settings, db_path, raw_articles):
@@ -127,7 +132,7 @@ def test_rss_enclosure_pa_artikel_med_bild(settings, db_path, raw_articles):
         enc = item.find("enclosure")
         assert enc is not None
         assert enc.get("type") == "image/webp"
-        assert enc.get("url").startswith("https://image.kyrkanstidning.se/")
+        assert enc.get("url").startswith("http://localhost:8000/images/")
 
 
 def test_enclosure_av_via_settings(settings, db_path, raw_articles):

@@ -14,36 +14,8 @@ from urllib.parse import quote
 
 from feedgen.feed import FeedGenerator
 
-from kt_rss.config import IMAGE_API_BASE, Settings
-
-
-def build_image_url(
-    image_id: str,
-    *,
-    width: int | None = None,
-    height: int | None = None,
-    fmt: str = "webp",
-) -> str:
-    """Bygger en bild-URL mot KT:s bild-API (spec SS2.2).
-
-    Crop låses till full bild (0/0/100/100) - feeden och webui vill ha hela
-    motivet, inte en panorama-crop. `width` ensam skalar proportionerligt;
-    `width`+`height` tvingar exakta mått och kan beskära. Utan någondera
-    svarar API:t bara med en pytteliten standardrendition (100x56) - ange
-    därför alltid minst `width`. Verifierat i bootstrap
-    (tests/fixtures/image-api-findings.md).
-    """
-    iid = str(image_id).strip()
-    url = (
-        f"{IMAGE_API_BASE}/{iid}.{fmt}?imageId={iid}"
-        f"&x=0&y=0&cropw=100&croph=100"
-        f"&heightx=0&heighty=0&heightw=100&heighth=100"
-    )
-    if width:
-        url += f"&width={width}"
-    if height:
-        url += f"&height={height}"
-    return f"{url}&format={fmt}"
+from kt_rss.config import Settings
+from kt_rss.image_cache import cached_image_url
 
 
 _ATOM_NS = "http://www.w3.org/2005/Atom"
@@ -54,14 +26,14 @@ def _fix_atom_enclosure_links(xml: bytes) -> bytes:
 
     feedgen 1.0.0 (entry.py:140) skuggar dict-variabeln `link` med ett nytt
     XML-element, så rel/type/length tappas på alla Atom-entry-länkar. Bild-
-    länkarna pekar på bild-API:t och kan därför identifieras säkert. Guarden
+    länkarna pekar på den lokala bildrouten och identifieras via `/images/`. Guarden
     `not link.get("rel")` gör fixen till en no-op om feedgen rättar buggen.
     """
     ET.register_namespace("", _ATOM_NS)
     root = ET.fromstring(xml)
     for link in root.iter(f"{{{_ATOM_NS}}}link"):
         href = link.get("href", "")
-        if href.startswith(IMAGE_API_BASE) and not link.get("rel"):
+        if "/images/" in href and not link.get("rel"):
             link.set("rel", "enclosure")
             link.set("type", "image/webp")
             link.set("length", "0")
@@ -171,9 +143,14 @@ def build_feed(
         # Bild-enclosure (spec SS2.2). RSS får ett korrekt <enclosure>;
         # Atom-länken lagas i efterhand pga en feedgen-bug (se
         # _fix_atom_enclosure_links).
-        if settings.include_image_enclosure and a["image_id"]:
+        image_href = (
+            cached_image_url(settings, a["image_id"], "feed")
+            if settings.include_image_enclosure and a["image_id"]
+            else None
+        )
+        if image_href:
             fe.link(
-                href=build_image_url(a["image_id"], width=1200),
+                href=image_href,
                 rel="enclosure",
                 type="image/webp",
                 length="0",

@@ -192,6 +192,19 @@ def init_db(db_path: str) -> None:
                 inserted  INTEGER NOT NULL DEFAULT 0,
                 updated   INTEGER NOT NULL DEFAULT 0
             );
+
+            CREATE TABLE IF NOT EXISTS image_cache (
+                image_id        TEXT NOT NULL,
+                variant         TEXT NOT NULL,
+                status          TEXT NOT NULL,
+                source_url      TEXT NOT NULL DEFAULT '',
+                size_bytes      INTEGER NOT NULL DEFAULT 0,
+                fetched_at      TEXT,
+                last_attempt_at TEXT NOT NULL,
+                next_attempt_at TEXT,
+                last_error      TEXT NOT NULL DEFAULT '',
+                PRIMARY KEY (image_id, variant)
+            );
             """
         )
         # ALTER TABLE-guards: kolumner som tillkom efter v1 (ROADMAP v2).

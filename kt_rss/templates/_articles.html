@@ -11,9 +11,10 @@
 <div class="day-sep">{{ dag }}</div>
 {% endif %}
 <article class="article" data-published="{{ a.published_at }}">
-  {% if a.image_id %}
+  {% set thumb_url = image_url(a.image_id) if a.image_id else none %}
+  {% if thumb_url %}
   <a class="article-thumb" href="{{ a.url }}" target="_blank" rel="noopener">
-    <img src="{{ image_url(a.image_id, width=480, height=312) }}"
+    <img src="{{ thumb_url }}"
          alt="" loading="lazy" decoding="async">
   </a>
   {% endif %}

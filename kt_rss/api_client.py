@@ -14,6 +14,12 @@ from dataclasses import dataclass
 import httpx
 
 from kt_rss.config import Settings
+from kt_rss.kt_client import (
+    KTClient,
+    WicketkeeperError,
+    get_kt_client,
+    is_wicketkeeper_challenge,
+)
 
 logger = logging.getLogger("kt_rss.api")
 
@@ -66,6 +72,7 @@ def fetch_articles(
     start: int | None,
     etag: str | None = None,
     last_modified: str | None = None,
+    client: KTClient | None = None,
 ) -> FetchResult:
     """Hämtar en sida artiklar. Kastar aldrig - returnerar alltid ett FetchResult."""
     params = build_params(limit, start)
@@ -84,45 +91,54 @@ def fetch_articles(
         headers["If-Modified-Since"] = last_modified
 
     last_error: str | None = None
-    with httpx.Client(timeout=TIMEOUT, follow_redirects=True) as client:
-        for attempt in range(MAX_RETRIES + 1):
-            if attempt:
-                delay = BACKOFF_BASE * (2 ** (attempt - 1))
-                logger.info("retry %d/%d efter %.0fs", attempt, MAX_RETRIES, delay)
-                time.sleep(delay)
+    kt_client = client or get_kt_client(settings)
+    for attempt in range(MAX_RETRIES + 1):
+        if attempt:
+            delay = BACKOFF_BASE * (2 ** (attempt - 1))
+            logger.info("retry %d/%d efter %.0fs", attempt, MAX_RETRIES, delay)
+            time.sleep(delay)
+        try:
+            resp = kt_client.get(settings.api_url, params=params, headers=headers)
+        except WicketkeeperError as exc:
+            return FetchResult(ok=False, status_code=200, error=str(exc))
+        except httpx.HTTPError as exc:
+            last_error = f"{type(exc).__name__}: {exc}"
+            logger.warning("anrop misslyckades (försök %d): %s",
+                           attempt + 1, last_error)
+            continue
+
+        if resp.status_code == 304:
+            return FetchResult(ok=True, not_modified=True, status_code=304)
+
+        if is_wicketkeeper_challenge(resp):
+            return FetchResult(
+                ok=False,
+                status_code=200,
+                error="Wicketkeeper-challenge kvar efter verifiering",
+            )
+
+        if resp.status_code == 200:
             try:
-                resp = client.get(settings.api_url, params=params, headers=headers)
-            except httpx.HTTPError as exc:
-                last_error = f"{type(exc).__name__}: {exc}"
-                logger.warning("anrop misslyckades (försök %d): %s",
-                               attempt + 1, last_error)
-                continue
+                data = resp.json()
+            except ValueError as exc:
+                return FetchResult(ok=False, status_code=200,
+                                   error=f"oparsbar JSON: {exc}")
+            return FetchResult(
+                ok=True,
+                status_code=200,
+                data=data,
+                etag=resp.headers.get("ETag"),
+                last_modified=resp.headers.get("Last-Modified"),
+            )
 
-            if resp.status_code == 304:
-                return FetchResult(ok=True, not_modified=True, status_code=304)
+        if resp.status_code in RETRYABLE_STATUS:
+            last_error = f"HTTP {resp.status_code}"
+            logger.warning("retrybar status %d (försök %d)",
+                           resp.status_code, attempt + 1)
+            continue
 
-            if resp.status_code == 200:
-                try:
-                    data = resp.json()
-                except ValueError as exc:
-                    return FetchResult(ok=False, status_code=200,
-                                       error=f"oparsbar JSON: {exc}")
-                return FetchResult(
-                    ok=True,
-                    status_code=200,
-                    data=data,
-                    etag=resp.headers.get("ETag"),
-                    last_modified=resp.headers.get("Last-Modified"),
-                )
-
-            if resp.status_code in RETRYABLE_STATUS:
-                last_error = f"HTTP {resp.status_code}"
-                logger.warning("retrybar status %d (försök %d)",
-                               resp.status_code, attempt + 1)
-                continue
-
-            # Icke-retrybar status (t.ex. 4xx) - ge upp direkt.
-            return FetchResult(ok=False, status_code=resp.status_code,
-                               error=f"HTTP {resp.status_code}")
+        # Icke-retrybar status (t.ex. 4xx) - ge upp direkt.
+        return FetchResult(ok=False, status_code=resp.status_code,
+                           error=f"HTTP {resp.status_code}")
 
     return FetchResult(ok=False, error=last_error or "okänt fel efter retries")

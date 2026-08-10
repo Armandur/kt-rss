@@ -14,7 +14,7 @@ from kt_rss import __version__
 # Minsta tillåtna pollningsintervall (hövlighet mot KT:s API, spec SS3).
 MIN_POLL_MINUTES = 15
 
-# KT:s bild-API. Dokumenterat för v2 (bild-enclosure), ej använt i v1-feeden.
+# KT:s bild-API. Används endast av den seriella lokala bildcachen.
 IMAGE_API_BASE = "https://image.kyrkanstidning.se"
 
 # section_tag-värden som räknas som debatt/insändare snarare än redaktionellt

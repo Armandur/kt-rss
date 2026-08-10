@@ -1,6 +1,6 @@
 """Bild-URL-bygge för enclosure (spec SS2.2)."""
 
-from kt_rss.feed import build_image_url
+from kt_rss.image_cache import build_image_url
 
 IMG = "https://image.kyrkanstidning.se"
 

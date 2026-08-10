@@ -20,8 +20,8 @@ from pathlib import Path
 from urllib.parse import quote
 from zoneinfo import ZoneInfo
 
-from fastapi import Depends, FastAPI, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -51,7 +51,14 @@ from kt_rss.db import (
     STATUS_SANITY_FAILED,
     STATUS_SKIPPED_304,
 )
-from kt_rss.feed import build_feed, build_image_url, build_opml
+from kt_rss.feed import build_feed, build_opml
+from kt_rss.image_cache import (
+    cached_image_url,
+    image_cache_path,
+    start_image_worker,
+    stop_image_worker,
+)
+from kt_rss.kt_client import close_kt_client
 from kt_rss.scheduler import create_scheduler
 
 logger = logging.getLogger("kt_rss")
@@ -121,7 +128,15 @@ def _git_branch() -> str | None:
 
 templates.env.filters["sv_date"] = _sv_date
 templates.env.filters["sv_datetime"] = _sv_datetime
-templates.env.globals["image_url"] = build_image_url
+
+
+def _template_image_url(image_id: str) -> str | None:
+    app_instance = globals().get("app")
+    settings = getattr(getattr(app_instance, "state", None), "settings", None)
+    return cached_image_url(settings or get_settings(), image_id, "thumb")
+
+
+templates.env.globals["image_url"] = _template_image_url
 
 
 @asynccontextmanager
@@ -133,6 +148,14 @@ async def lifespan(app: FastAPI):
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
     init_db(settings.db_path)
+    image_worker = start_image_worker(settings)
+    conn = connect(settings.db_path)
+    try:
+        image_worker.enqueue_many(
+            [row["image_id"] for row in get_articles(conn, limit=settings.max_items)]
+        )
+    finally:
+        conn.close()
     scheduler = create_scheduler(settings)
     scheduler.start()
     app.state.settings = settings
@@ -143,11 +166,35 @@ async def lifespan(app: FastAPI):
         yield
     finally:
         scheduler.shutdown(wait=False)
+        stop_image_worker()
+        close_kt_client()
         logger.info("kt-rss stoppad")
 
 
 app = FastAPI(title="kt-rss", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=str(_BASE_DIR / "static")), name="static")
+
+
+@app.head("/images/{image_id}/{variant}.webp")
+@app.get("/images/{image_id}/{variant}.webp")
+def local_image(request: Request, image_id: str, variant: str) -> Response:
+    settings: Settings = request.app.state.settings
+    try:
+        path = image_cache_path(settings, image_id, variant)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Bilden finns inte") from None
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Bilden finns inte")
+
+    stat = path.stat()
+    etag = f'"{stat.st_size:x}-{stat.st_mtime_ns:x}"'
+    headers = {
+        "ETag": etag,
+        "Cache-Control": "public, max-age=31536000, immutable",
+    }
+    if request.headers.get("if-none-match") == etag:
+        return Response(status_code=304, headers=headers)
+    return FileResponse(path, media_type="image/webp", headers=headers)
 
 
 def get_conn_settings(request: Request):

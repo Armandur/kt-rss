@@ -153,15 +153,18 @@ https://image.kyrkanstidning.se/433475.webp?imageId=433475
   faktiskt accepterar** innan URL-byggaren skrivs.
 
 **Användning i detta projekt (v2):**
-- `feed.py:build_image_url(image_id, *, width, height, fmt)` bygger bild-URL:er.
-  Crop låses till full bild (`0/0/100/100`) - feeds och webui vill ha hela
-  motivet, inte en panorama-crop. `width`/`height` ger en nedskalad rendition
-  (KT:s egen listvy använder 240x156); webui skickar 480x312, feed-enclosure
-  utelämnar storlek.
-- Feeds: artikelbilden läggs som enclosure (Atom `<link rel="enclosure">` /
-  RSS `<enclosure>`). feedgen 1.0.0 tappar attribut på Atom-entry-länkar, så
-  `feed.py` lagar dem i efterhand (`_fix_atom_enclosure_links`).
-- HTML: artikellistorna visar bilden som `loading="lazy"`-thumbnail.
+- `image_cache.py:build_image_url()` bygger fullbildscrop `0/0/100/100`.
+- KT:s Labrador/Wicketkeeper-challenge löses genom det dokumenterade
+  SHA-256-protokollet i `kt_client.py`. En verifierad `LabPowToken` hålls bara
+  i processminne och används för både artikel- och bildsubdomänen.
+- Bilder hämtas med global samtidighet 1 och minst tre sekunder mellan
+  externa bildanrop. Godkänd WebP skrivs atomiskt under databaskatalogens
+  `images/{image_id}/`.
+- `thumb.webp` är 480x312. `feed.webp` har width=1200 och proportionell höjd.
+- HTML och feeds använder endast kt-rss lokala `/images/...`-routes. Saknad
+  cache innebär att bilden utelämnas, aldrig extern fallback.
+- Feeds lägger en befintlig lokal `feed.webp` som enclosure. feedgen 1.0.0
+  tappar attribut på Atom-entry-länkar, så `feed.py` lagar dem i efterhand.
 - Env `KT_RSS_INCLUDE_IMAGE_ENCLOSURE` (default `true`) styr feed-enclosuren.
 
 ### 2.3 Känd oklarhet — MÅSTE utredas i bootstrap (§10)
@@ -211,6 +214,8 @@ hövliga anrop** och sparar råsvar som fixtures innan vidare kodning.
 - **Timeout & retries:** 15 s timeout, max 2 retries, exponentiell backoff,
   ge upp tyst (logga) hellre än att hamra.
 - **Backoff vid fel:** vid upprepade `429`/`5xx`, pausa en runda.
+- **Bilder:** persistent cache, samtidighet 1 och minst tre sekunder mellan
+  externa bildanrop. Misslyckade varianter får sex timmars cooldown.
 - **Endast GET.**
 
 ---
@@ -267,6 +272,12 @@ pytest. **Ingen HTML-parser.** Minimala dependencies.
 ### Tabell `poll_log`
 En rad per pollrunda: `id` PK, `run_at`, `status`, `fetched`, `inserted`,
 `updated`. Skrivs av `poll_once`, visas som pollhistorik på `/status`.
+
+### Tabell `image_cache`
+En rad per `image_id` och variant (`thumb`/`feed`): status, käll-URL,
+filstorlek, senaste försök, cachetid, nästa tillåtna försök och senaste fel.
+Filens existens under databaskatalogens `images/` är sanningen för om bilden
+kan serveras.
 
 ### FTS5-index `articles_fts`
 Virtuell FTS5-tabell (external content mot `articles`) som indexerar

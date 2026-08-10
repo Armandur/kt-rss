@@ -31,6 +31,8 @@ Ingen HTML-parser, ingen bundler, inga webbteckensnitt.
 kt_rss/
   config.py       pydantic-settings + statiska API-konstanter + BOOTSTRAP-FYND
   api_client.py   httpx-GET: query-bygge, cache-buster, headers/UA, retry/backoff
+  kt_client.py    gemensam cookie-session + Labrador/Wicketkeeper-PoW
+  image_cache.py  seriell bildkö, WebP-validering och persistent filcache
   inspect.py      engångs bootstrap-utredning mot live-API (spec §10)
   db.py           SQLite-schema, mapping (map_article), dedup (upsert_article)
   poller.py       en pollningsrunda: sanity, filtrering, upsert
@@ -65,6 +67,8 @@ som faktiskt ändras.
   m.m.
 - `poll_log` - en rad per pollrunda (tid, status, antal hämtade/nya/
   uppdaterade). `poll_once` skriver, `/status` visar pollhistoriken.
+- `image_cache` - status och cooldown per bild-id/variant. Själva WebP-filen
+  under databaskatalogens `images/` avgör om bilden kan serveras.
 - `articles_fts` - FTS5-fulltextindex (external content mot `articles`,
   triggersynkat) för `/search`. `init_db()` kör `'rebuild'` vid start.
 
@@ -91,6 +95,11 @@ inte bort dem.
 Pollintervall minst 15 min, bara nyaste sidan per poll, ärlig User-Agent,
 timeout + få retries, endast GET. Se `api_client.py` och spec §3.
 
+Bildhämtaren har global samtidighet 1 och minst tre sekunder mellan externa
+bildanrop. `kt_client.py` löser Labradors dokumenterade SHA-256-challenge
+endast när den visas och återanvänder `LabPowToken` i processminne. Bygg inte
+in fingerprint-maskering, proxyrotation eller extern scrapingtjänst.
+
 ## URL-schema
 
 `/` index, `/articles` + `/s/{section}` + `/t/{tag}` + `/a/{author}`
@@ -98,7 +107,7 @@ timeout + få retries, endast GET. Se `api_client.py` och spec §3.
 skribentöversikt, `/archive` arkivöversikt, `/tags` bygg-en-feed-vy,
 `/search` artikelsök, `/suggest` (JSON-autocomplete för sökrutan),
 `/latest` (JSON: antal nyare artiklar, driver liveuppdateringen),
-`/status` status-/statistiksida, `/feed.xml` +
+`/images/{image_id}/{thumb,feed}.webp` lokalt cachade bilder, `/status` status-/statistiksida, `/feed.xml` +
 `/feed/{section}.xml` + `/feed/t/{tag}.xml` +
 `/feed/a/{author}.xml` + `/feed/tags.xml` (flera taggar,
 `?t=a,b&mode=or/and`) + `/feed/search.xml` (`?q=` sökterm) Atom
