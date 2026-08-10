@@ -215,7 +215,10 @@ hövliga anrop** och sparar råsvar som fixtures innan vidare kodning.
   ge upp tyst (logga) hellre än att hamra.
 - **Backoff vid fel:** vid upprepade `429`/`5xx`, pausa en runda.
 - **Bilder:** persistent cache, samtidighet 1 och minst tre sekunder mellan
-  externa bildanrop. Misslyckade varianter får sex timmars cooldown.
+  externa bildanrop.
+  Misslyckade varianter får sex timmars cooldown. En kvarstående
+  Wicketkeeper-challenge öppnar dessutom en global persistent breaker i sex
+  timmar så att kön inte provar nästa bild.
 - **Endast GET.**
 
 ---
@@ -278,6 +281,11 @@ En rad per `image_id` och variant (`thumb`/`feed`): status, käll-URL,
 filstorlek, senaste försök, cachetid, nästa tillåtna försök och senaste fel.
 Filens existens under databaskatalogens `images/` är sanningen för om bilden
 kan serveras.
+
+### Tabell `image_cache_state`
+En singletonrad med global `circuit_open_until`, senaste challenge-fel och
+tidpunkt. Den stoppar alla bildanrop under breakerperioden och överlever
+containeromstart.
 
 ### FTS5-index `articles_fts`
 Virtuell FTS5-tabell (external content mot `articles`) som indexerar
@@ -347,6 +355,22 @@ verktyg, ej del av löpande drift.
 - blockerar inte appstart eller `/healthz`.
 När hela arkivet är genomgånget skapas markörfilen `{db_path}.backfill-done`
 som hindrar omkörning vid varje omstart; ta bort den för att köra om.
+
+### 8.2 Explicit historisk bildbackfill
+
+CLI `python -m kt_rss.image_backfill --limit N --variant thumb|feed|all`
+värmer saknade varianter från det befintliga artikelarkivet. Urvalet är
+deterministiskt, nyast först och thumbnails före feedvarianter. Befintliga
+filer och poster med aktiv cooldown hoppas över, så nästa körning fortsätter
+automatiskt där den förra slutade.
+
+CLI:n använder samma `ImageCacheWorker` som driften: samtidighet 1 och minst
+tre sekunder mellan externa bildanrop. En kvarstående Wicketkeeper-challenge
+avbryter återstående kö, öppnar global sex timmars breaker och ger exitkod 2.
+Standardgränsen är 100 varianter. Ingen historisk bildbackfill startar vid
+appstart. CLI:n körs när webbappen är stoppad eftersom trådlåset är
+processlokalt. `/status` visar cacheantal, storlek, kö, senaste fel och
+breakerstatus.
 
 ---
 

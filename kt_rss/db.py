@@ -205,6 +205,17 @@ def init_db(db_path: str) -> None:
                 last_error      TEXT NOT NULL DEFAULT '',
                 PRIMARY KEY (image_id, variant)
             );
+
+            CREATE TABLE IF NOT EXISTS image_cache_state (
+                key                TEXT PRIMARY KEY,
+                circuit_open_until TEXT,
+                last_error_at      TEXT,
+                last_error         TEXT NOT NULL DEFAULT ''
+            );
+
+            INSERT OR IGNORE INTO image_cache_state (
+                key, circuit_open_until, last_error_at, last_error
+            ) VALUES ('default', NULL, NULL, '');
             """
         )
         # ALTER TABLE-guards: kolumner som tillkom efter v1 (ROADMAP v2).

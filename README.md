@@ -29,7 +29,7 @@ Brödtext återpubliceras aldrig (se [Innehållspolicy](#innehållspolicy)).
 | `/archive/{år}/{månad}` | Stylead HTML-lista per publiceringsmånad |
 | `/tags` | Bygg en feed på flera taggar (sök + kryssrutor) |
 | `/search` | Sök artiklar på rubrik och ingress (`?q=`) |
-| `/status` | Status- och statistiksida (pollning, antal, DB-storlek) |
+| `/status` | Status- och statistiksida (pollning, bildcache, kö, breaker, antal) |
 | `/feed.xml` | Atom, alla sektioner (`?fmt=rss` ger RSS 2.0) |
 | `/feed/{section}.xml` | Atom per sektion (`?fmt=rss` ger RSS 2.0) |
 | `/feed/t/{tag}.xml` | Atom per tagg (`?fmt=rss` ger RSS 2.0) |
@@ -158,6 +158,35 @@ uv run python -m kt_rss.backfill --pages 10 --delay 3
 Paginerar bakåt via offset tills `--pages` nås eller arkivet är slut.
 Senaste klarade offset sparas i en sidecar-fil bredvid databasen, så en
 avbruten körning kan återupptas genom att köra kommandot igen.
+
+### Historisk bildbackfill
+
+Bildcachen värmer bara de senaste artiklarna automatiskt. Äldre bilder hämtas
+med ett separat verktyg som använder samma seriella tresekunderskö och hoppar
+över redan cachade varianter samt aktiv cooldown:
+
+```bash
+uv run python -m kt_rss.image_backfill --limit 100 --variant thumb
+```
+
+`--limit` räknar bildvarianter per körning. `--variant` kan vara `thumb`,
+`feed` eller `all`; `all` tar thumbnails först. Kör kommandot igen för att
+fortsätta vid nästa saknade variant. En kvarstående Wicketkeeper-challenge
+avbryter körningen och öppnar sex timmars circuit breaker, som visas på
+`/status`. Ingen helarkivs-backfill startar automatiskt.
+
+Kör inte CLI:n parallellt med webbappens bildworker. För Dockerimagen:
+
+```bash
+docker stop kt-rss
+docker run --rm --volumes-from kt-rss ghcr.io/armandur/kt-rss:latest \
+  python -m kt_rss.image_backfill --limit 100 --variant thumb
+docker start kt-rss
+```
+
+Den befintliga `/data/kt.sqlite3` återanvänds. Bildbackfillen ändrar inte
+artikelraderna. Ta en backup av den monterade appdata-katalogen före första
+körningen i produktion.
 
 ## Innehållspolicy
 

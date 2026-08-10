@@ -55,6 +55,7 @@ from kt_rss.feed import build_feed, build_opml
 from kt_rss.image_cache import (
     cached_image_url,
     image_cache_path,
+    image_cache_status,
     start_image_worker,
     stop_image_worker,
 )
@@ -797,6 +798,18 @@ def status_page(request: Request, conn_settings=Depends(get_conn_settings)):
     )
     last_run = state["last_run_at"] if state else None
     last_status = state["last_status"] if state else None
+    image_status = image_cache_status(settings)
+    queue_state = image_status["queue"]
+    active_image = queue_state["active"]
+    if active_image:
+        queue_label = (
+            f"hämtar {active_image[0]}/{active_image[1]}, "
+            f"{queue_state['queued']} väntar"
+        )
+    elif queue_state["running"]:
+        queue_label = f"redo, {queue_state['queued']} väntar"
+    else:
+        queue_label = "stoppad"
 
     def _period(row) -> str:
         return f"{SV_MONTHS[int(row['month'])]} {row['year']}"
@@ -850,6 +863,19 @@ def status_page(request: Request, conn_settings=Depends(get_conn_settings)):
             "newest_period": _period(months[0]) if months else None,
             "oldest_period": _period(months[-1]) if months else None,
             "db_size": _human_size(db_bytes),
+            "image_cache": image_status,
+            "image_cache_size": _human_size(image_status["size_bytes"]),
+            "image_queue": queue_label,
+            "image_circuit_until": (
+                _sv_datetime(image_status["circuit"]["open_until"])
+                if image_status["circuit"]["open"]
+                else None
+            ),
+            "image_error_at": (
+                _sv_datetime(image_status["latest_error"]["last_attempt_at"])
+                if image_status["latest_error"]
+                else None
+            ),
             "polls": polls,
             "chart": chart,
             "version": __version__,

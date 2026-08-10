@@ -30,6 +30,30 @@
 </section>
 
 <section class="status-block">
+  <h2>Bildcache</h2>
+  <dl class="status-grid">
+    <dt>Cachade bild-id</dt><dd>{{ image_cache.cached_images }}</dd>
+    <dt>Cachade varianter</dt><dd>{{ image_cache.cached_variants }}</dd>
+    <dt>Storlek</dt><dd>{{ image_cache_size }}</dd>
+    <dt>Kö</dt><dd>{{ image_queue }}</dd>
+    <dt>Circuit breaker</dt>
+    <dd>
+      {% if image_circuit_until %}
+        öppen till {{ image_circuit_until }}
+      {% else %}stängd{% endif %}
+    </dd>
+    <dt>Senaste fel</dt>
+    <dd>
+      {% if image_cache.latest_error %}
+        {{ image_error_at }}: {{ image_cache.latest_error.image_id }}/
+        {{ image_cache.latest_error.variant }} -
+        {{ image_cache.latest_error.last_error }}
+      {% else %}-{% endif %}
+    </dd>
+  </dl>
+</section>
+
+<section class="status-block">
   <h2>Pollhistorik</h2>
   {% if polls %}
   <table class="poll-log">
